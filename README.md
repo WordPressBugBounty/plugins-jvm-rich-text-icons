@@ -1,0 +1,1 @@
+# plugins-jvm-rich-text-icons
