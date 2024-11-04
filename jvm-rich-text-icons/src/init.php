@@ -48,6 +48,22 @@ class JVM_Richtext_icons {
                 'editor_script' => 'jvm-rich-text-icons-js',
                 // Enqueue blocks.editor.build.css in the editor only.
                 'editor_style'  => 'jvm-rich-text-icons-editor-css',
+                'supports' => [
+                    'align' => true,
+                    'color' => [
+                      'text' => true,
+                      'background' => true,
+                      'link' => false
+                    ],
+                    'spacing' => [
+                        'padding' => true,
+                        'margin' => true,
+                        '__experimentalDefaultControls' => [
+                            'margin' => false,
+                            'padding' =>  false
+                        ]
+                    ]
+                ]
             )
         );
     }
