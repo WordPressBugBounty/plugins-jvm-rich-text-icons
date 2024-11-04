@@ -11,6 +11,7 @@ const { registerBlockType } = wp.blocks;
 const { InspectorControls } = wp.blockEditor;
 const { PanelBody } = wp.components;
 const { ComboboxControl } = wp.components;
+const { RangeControl } = wp.components;
 
 //import icon from './icon';
 
@@ -68,6 +69,10 @@ registerBlockType( 'jvm/single-icon', {
         icon: {
             type: 'string'
         },
+
+        fontSize: {
+            type: 'number'
+        }
     },
 
     /**
@@ -85,6 +90,7 @@ registerBlockType( 'jvm/single-icon', {
         let icons = jvm_richtext_icon_settings.iconset;
         let options = [];
         let selectectValue = '';
+        let currentFontSize = 32;
         let classPrefix = jvm_richtext_icon_settings.base_class
 
         for (let icon of icons) {
@@ -103,11 +109,17 @@ registerBlockType( 'jvm/single-icon', {
             }
         }
 
+        // Get current font size
+        if (props.attributes.fontSize !== undefined) {
+            currentFontSize = props.attributes.fontSize;
+        }
+
         // Update the proerties
-        props.setAttributes( { icon: selectectValue } );
+        props.setAttributes( { icon: selectectValue, fontSize: currentFontSize } );
 
         let cssClass = classPrefix + ' '+props.attributes.icon;
-
+        let cssStyle = {fontSize: props.attributes.fontSize + 'px'};
+        
         return [
             <InspectorControls>
                 <PanelBody
@@ -128,13 +140,24 @@ registerBlockType( 'jvm/single-icon', {
                         }}
             isMulti='false'
                         />
+                        <RangeControl
+                        label={__('Font Size (px)')}
+                        value={currentFontSize}
+                        min='10'
+                        max='200'
+                        onChange={(i) => {
+                            if (i) {
+                                props.setAttributes( { fontSize: i } );
+                            }
+                        }}
+                        />
                 </PanelBody>
 
             </InspectorControls>
             ,
             
             <div className={ props.className }>
-                <i class={cssClass} aria-hidden="true"> </i>
+                <i class={cssClass} aria-hidden="true" style={cssStyle}> </i>
             </div>
         ];
     },
@@ -153,9 +176,10 @@ registerBlockType( 'jvm/single-icon', {
     save: ( props ) => {
         let classPrefix = jvm_richtext_icon_settings.base_class;
         let cssClass = classPrefix + ' '+props.attributes.icon;
+        let cssStyle = {fontSize: props.attributes.fontSize + 'px'};
         return (
             <div className={ props.className }>
-               <i class={cssClass} aria-hidden="true"> </i>
+                <i class={cssClass} aria-hidden="true" style={cssStyle}> </i>
             </div>
         );
     },

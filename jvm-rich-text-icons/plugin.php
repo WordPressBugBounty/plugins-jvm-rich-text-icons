@@ -2,7 +2,7 @@
 /**
  * Plugin Name: JVM rich text icons
  * Description: Add Font Awesome icons, or (SVG) icons from a custom icon set to the WordPress block editor.
- * Version: 1.3.1
+ * Version: 1.3.2
  * Author: Joris van Montfort
  * Author URI: https://jorisvm.nl
  * Text Domain: jvm-richtext-icons
@@ -10,7 +10,7 @@
  *
  * @category Gutenberg
  * @author Joris van Montfort
- * @version 1.3.1
+ * @version 1.3.2
  * @package JVM rich text icons
  */
 
