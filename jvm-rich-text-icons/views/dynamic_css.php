@@ -1,3 +1,6 @@
+.wp-block {
+    /* Fixes the iframe site editor */   
+}
 <?php
 $prefix_class = JVM_Richtext_icons::get_class_prefix();
 ?>

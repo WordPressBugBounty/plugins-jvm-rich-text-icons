@@ -89,6 +89,9 @@ Please note that settings will still be loaded so please make sure you have set 
 
 == Changelog ==
 
+= 1.3.3 =
+Added a fix for CSS in the full site editor and block editor when using custom icons.
+
 = 1.3.2 =
 Added a font-size (pixels) option for single icon block.
 
