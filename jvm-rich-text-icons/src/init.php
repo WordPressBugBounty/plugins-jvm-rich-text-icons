@@ -192,9 +192,9 @@ class JVM_Richtext_icons {
             if ($icon_set == 'default') {
                 $fontCssFile = plugins_url( 'dist/fa-4.7/font-awesome.min.css', dirname( __FILE__ ));
             }else if ($icon_set == 'fa-5') {
-                $fontCssFile = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+                $fontCssFile = plugins_url( 'dist/fa-5/css/all.min.css', dirname( __FILE__ ));
             }else if ($icon_set == 'fa-6') {
-                $fontCssFile = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css';
+                $fontCssFile = plugins_url( 'dist/fa-6/css/all.min.css', dirname( __FILE__ ));
             }
 
             // Icon set CSS (font awesome 4.7 is shipped by default).

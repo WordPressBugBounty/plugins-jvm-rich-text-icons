@@ -3,7 +3,7 @@ Contributors: jorisvanmontfort
 Donate link: https://www.paypal.com/donate/?hosted_button_id=VXZJG9GC34JJU
 Tags: gutenberg, SVG, icon, font awesome, ACF
 Requires at least: 5.4
-Tested up to: 6.6.2
+Tested up to: 6.9
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -88,6 +88,15 @@ add_filter('jvm_richtext_icons_show_settings', '__return_false');
 Please note that settings will still be loaded so please make sure you have set the settings to default font awesome if you are loading a custom icon set with the plugin hooks.
 
 == Changelog ==
+
+= 1.3.7 =
+Tested on WordPress 6.9
+
+= 1.3.6 =
+Font awesome 5.x and 6.x have been updated and are now loaded from a source within the plugin. This also fixes a bug where Font Awesome icons did not display in the block pattern / full site editor.
+
+= 1.3.4 =
+Php deprecation warning fixed.
 
 = 1.3.3 =
 Added a fix for CSS in the full site editor and block editor when using custom icons.

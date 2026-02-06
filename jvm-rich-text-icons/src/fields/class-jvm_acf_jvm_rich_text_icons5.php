@@ -6,7 +6,11 @@ if( ! defined( 'ABSPATH' ) ) exit;
 if( !class_exists('JVM_acf_field_jvm_rich_text_icons') ) {
 
 class JVM_acf_field_jvm_rich_text_icons extends acf_field {
-    
+    /**
+     * Settings (array) Store plugin settings (url, path, version) as a reference for later use with assets
+     * @var array
+     */
+    public $settings;
     
     /*
     *  __construct

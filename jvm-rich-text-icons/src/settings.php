@@ -223,7 +223,7 @@ class JVM_Richtext_icons_settings {
                 $checked = $this->options['icon_set'] == 'fa-5' ? ' selected' : '';
                 echo '<option value="fa-5"'.$checked.'>'.__('Font Awsome Free 5.15.4', 'jvm-rich-text-icons').'</option>';
                 $checked = $this->options['icon_set'] == 'fa-6' ? ' selected' : '';
-                echo '<option value="fa-6"'.$checked.'>'.__('Font Awsome Free 6.2.0', 'jvm-rich-text-icons').'</option>';
+                echo '<option value="fa-6"'.$checked.'>'.__('Font Awsome Free 6.7.2', 'jvm-rich-text-icons').'</option>';
                 $checked = $this->options['icon_set'] == 'custom-svg' ? ' selected' : '';
                 echo '<option value="custom-svg"'.$checked.'>'.__('Custom SVG icon set', 'jvm-rich-text-icons').'</option>';
                 echo '</select>';
