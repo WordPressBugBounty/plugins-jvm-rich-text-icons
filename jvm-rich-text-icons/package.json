@@ -3,11 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "cgb-scripts start",
-    "build": "cgb-scripts build",
-    "eject": "cgb-scripts eject"
+    "start": "webpack --watch --mode=development --config webpack.config.js",
+    "build": "webpack --config webpack.config.js"
   },
-  "dependencies": {
-    "cgb-scripts": "1.23.1"
+  "devDependencies": {
+    "@wordpress/scripts": "^31.4.0"
   }
 }

@@ -7,7 +7,7 @@ $files = JVM_Richtext_icons::get_svg_file_list();
     $nonce = wp_create_nonce( 'jvm-rich-text-icons-delete-icon' );
     foreach ($files as $file) {
         $pi = pathinfo($file);
-        
+
         $icon_class = sanitize_title($pi['filename']);
 
         echo '<a id="icon-dialog-link-'.$icon_class.'" href="#icon-dialog" class="icon-dialog-link icon" data-icon-class-full="'.$css_class . ' ' . $icon_class .'" data-icon-class="'. $icon_class .'" data-file="'.esc_js(basename($file)).'" data-nonce="'.$nonce.'">';
@@ -21,4 +21,4 @@ $files = JVM_Richtext_icons::get_svg_file_list();
         <i id="icon-dialog-preview" aria-hidden="true"> </i>
     </div>
 </div>
-<p id="svg-file-list-empty" <?php echo empty($files) ? '' : 'style="display:none;"';?>><?php _e('No custom icons have been uploaded. Please upload some SVG files to create your custom icon set.', 'jvm-richt-text-icons');?></p>
+<p id="svg-file-list-empty" <?php echo empty($files) ? '' : 'style="display:none;"';?>><?php _e('No custom icons have been uploaded. Please upload some SVG files to create your custom icon set.', 'jvm-rich-text-icons');?></p>

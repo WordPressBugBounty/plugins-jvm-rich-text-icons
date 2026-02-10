@@ -1,5 +1,5 @@
 .wp-block {
-    /* Fixes the iframe site editor */   
+    /* Fixes the iframe site editor */
 }
 <?php
 $prefix_class = JVM_Richtext_icons::get_class_prefix();
@@ -8,8 +8,8 @@ i.<?php echo $prefix_class;?> {
     width: 1em;
     display: inline-block;
     height: 1em;
-    background-color: currentColor; 
-    mask-repeat: no-repeat; 
+    background-color: currentColor;
+    mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-repeat: no-repeat;
     mask-size:contain;
@@ -20,12 +20,13 @@ i.<?php echo $prefix_class;?> {
 }
 
 
-<?php 
+<?php
     foreach ($files as $file) {
         $pi = pathinfo($file);
-        
+
         $icon_class = sanitize_title($pi['filename']);
         $file_content = file_get_contents($file);
+        if ($file_content === false) { continue; }
         $width = 0;
         $height = 0;
         $ratio = 1;
@@ -35,27 +36,27 @@ i.<?php echo $prefix_class;?> {
         $svg = $dom->getElementsByTagName('svg');
         if ($svg) {
             $viewBox = $svg[0]->getAttribute('viewBox');
-            
+
             if ($viewBox) {
                 list($x, $y, $width, $height) = explode(' ', $viewBox);
 
-                //echo $width;    
+                //echo $width;
                 //echo $height;
 
-                
 
-                //echo 'ratio:'.$ratio."\n";  
+
+                //echo 'ratio:'.$ratio."\n";
             }else {
                 // Might have width and height on svg
                 $width = str_replace('px', '', $svg[0]->getAttribute('width'));
                 $height = str_replace('px', '', $svg[0]->getAttribute('height'));
             }
-            
+
             if (!empty($width) && !empty($height)) {
                 $ratio = $width / $height;
             }
         }
-            
+
 
 ?>
 i.<?php echo $prefix_class;?>.<?php echo $icon_class;?> {

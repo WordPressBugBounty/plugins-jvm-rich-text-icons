@@ -95,13 +95,18 @@ class JVM_Richtext_icons_settings {
                     ]
                 ]
             );
-        } 
+        }
     }
 
     /**
      * Remove an icon
      */
     public function ajax_delete_icon() {
+        if (!current_user_can('upload_files')) {
+            wp_send_json(["success" => false]);
+            exit;
+        }
+
         if (isset($_POST['file']) && wp_verify_nonce($_POST['nonce'], 'jvm-rich-text-icons-delete-icon' )) {
             $file = sanitize_file_name($_POST['file']);
             $base = JVM_Richtext_icons::get_svg_directory();
@@ -113,7 +118,7 @@ class JVM_Richtext_icons_settings {
                 }
             }
         }
-        
+
         wp_send_json(["success" => false]);
         exit;
     }
@@ -122,11 +127,16 @@ class JVM_Richtext_icons_settings {
      * Upload an icon
      */
     public function ajax_upload_icon() {
+        if (!current_user_can('upload_files')) {
+            wp_send_json(["success" => false]);
+            exit;
+        }
+
         if (isset($_FILES['file']) && wp_verify_nonce($_GET['nonce'], 'jvm-rich-text-icons-upload-icon' )) {
             // Check if file is SVG as we only accept SVG files
             $pi = pathinfo($_FILES['file']['name']);
             if ($_FILES['file']['type'] == 'image/svg+xml' && strtolower($pi['extension']) == 'svg') {
-                
+
                 $base = JVM_Richtext_icons::get_svg_directory();
                 $new_file_name = $this->generate_unique_svg_file_name($_FILES['file']['name']);
                 if (move_uploaded_file($_FILES['file']['tmp_name'], $base.$new_file_name)) {
@@ -178,10 +188,10 @@ class JVM_Richtext_icons_settings {
     public function add_plugin_page() {
         // This page will be under "Settings"
         add_options_page(
-            'Settings Admin', 
-            __('JVM rich text icons', 'jvm-rich-text-icons'), 
-            'manage_options', 
-            'jvm-rich-text-icons', 
+            'Settings Admin',
+            __('JVM rich text icons', 'jvm-rich-text-icons'),
+            'manage_options',
+            'jvm-rich-text-icons',
             array( $this, 'create_admin_page' )
         );
     }
@@ -201,7 +211,7 @@ class JVM_Richtext_icons_settings {
     /**
      * Register and add settings
      */
-    public function page_init() {        
+    public function page_init() {
         // Set class property
         $this->options = JVM_Richtext_icons::get_settings();
 
@@ -214,7 +224,7 @@ class JVM_Richtext_icons_settings {
 
         add_settings_field(
             'icon_set', // ID
-            __('Icon set', 'jvm-rich-text-icons'), // Title 
+            __('Icon set', 'jvm-rich-text-icons'), // Title
             function () {
                 echo '<select id="jvm-rich-text-icons_icon_set" name="jvm-rich-text-icons[icon_set]">';
 
@@ -227,18 +237,21 @@ class JVM_Richtext_icons_settings {
                 $checked = $this->options['icon_set'] == 'custom-svg' ? ' selected' : '';
                 echo '<option value="custom-svg"'.$checked.'>'.__('Custom SVG icon set', 'jvm-rich-text-icons').'</option>';
                 echo '</select>';
-            }, 
+            },
             'jvm-rich-text-icons', // Page
-            'general' // Section           
+            'general' // Section
         );
 
         if ($this->options['icon_set'] == 'custom-svg') {
             add_settings_field(
                 'technology', // ID
-                __('Render technology', 'jvm-rich-text-icons'), // Title 
+                __('Render technology', 'jvm-rich-text-icons'), // Title
                 function () {
                     echo '<select name="jvm-rich-text-icons[technology]">';
-                    
+
+                    $checked = $this->options['technology'] == 'inline-svg' ? ' selected' : '';
+                    echo '<option value="inline-svg"'.$checked.'>'.__('Inline SVG', 'jvm-rich-text-icons').'</option>';
+
                     $checked = $this->options['technology'] == 'html-css' ? ' selected' : '';
                     echo '<option value="html-css"'.$checked.'>'.__('HTML + CSS', 'jvm-rich-text-icons').'</option>';
                     $checked = $this->options['technology'] == 'html-css-before' ? ' selected' : '';
@@ -247,11 +260,10 @@ class JVM_Richtext_icons_settings {
                     $checked = $this->options['technology'] == 'html-css-after' ? ' selected' : '';
                     echo '<option value="html-css-after"'.$checked.'>'.__('HTML + CSS ::after pseudo-element', 'jvm-rich-text-icons').'</option>';
 
-                    //echo '<option value="inline-svg">'.__('Inline SVG elements', 'jvm-rich-text-icons').'</option>';
                     echo '</select>';
-                }, 
+                },
                 'jvm-rich-text-icons', // Page
-                'general' // Section           
+                'general' // Section
             );
         }
 
@@ -272,9 +284,19 @@ class JVM_Richtext_icons_settings {
      * @param array $input Contains all settings fields as array keys
      */
     public function sanitize( $input ) {
+        $sanitized = [];
 
-        // Hmmm....
-        return $input;
+        $valid_icon_sets = ['default', 'fa-5', 'fa-6', 'custom-svg'];
+        if (isset($input['icon_set']) && in_array($input['icon_set'], $valid_icon_sets, true)) {
+            $sanitized['icon_set'] = $input['icon_set'];
+        }
+
+        $valid_technologies = ['html-css', 'html-css-before', 'html-css-after', 'inline-svg'];
+        if (isset($input['technology']) && in_array($input['technology'], $valid_technologies, true)) {
+            $sanitized['technology'] = $input['technology'];
+        }
+
+        return $sanitized;
     }
 }
 

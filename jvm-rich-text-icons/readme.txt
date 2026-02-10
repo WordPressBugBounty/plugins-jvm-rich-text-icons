@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=VXZJG9GC34JJU
 Tags: gutenberg, SVG, icon, font awesome, ACF
 Requires at least: 5.4
 Tested up to: 6.9
-Stable tag: trunk
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Playground: true
@@ -12,82 +12,82 @@ Playground: true
 Add Font Awesome icons, or icons from a custom icon set to rich text fields anywhere in the Gutenberg block editor!
 
 == Description ==
-A plugin / toolset for anyone wanting to integrate (SVG) icons into the Gutenberg editor or options created with Advanced Custom Fields. 
 
-Add inline icons to rich text fields like: paragraphs, headings, lists or buttons anywhere in the WordPress block editor, or add a dedicated icon block from within the Gutenberg editor.
+Add icons to any rich text field in the WordPress block editor. Insert icons inline in paragraphs, headings, lists, buttons, or use the dedicated single icon block.
 
-This plugin ships with the free Font Awesome icon set as default icon set. You can choose between version 4.x, 5.x and version 6.x.
-The dedicated icon block contains several styling options to customize the icon in the icon block.
-The plugin also provides an easy to use interface for creating a custom icon set based on SVG icons. Custom icons can be uploaded from the plugin settings using an easy to use drag & drop uploader.
+= Features =
 
-For users of Advanced Custom Fields (ACF) the plugin also creates a new field type: JVM Icon. This allows you to create custom fields that work with a the font awsome icon or any custom created icon set.
+* **Icon picker** - Select icons from a searchable popup in the block editor toolbar.
+* **Font Awesome included** - Ships with Font Awesome 4.7, 5.x and 6.x. Choose your preferred version from the settings.
+* **Custom SVG icon set** - Upload your own SVG icons via a drag & drop uploader in the plugin settings. This is the recommended approach for the best performance.
+* **Single icon block** - A dedicated block with font size, color, alignment and spacing options.
+* **ACF integration** - Adds a "JVM Icon" field type for Advanced Custom Fields.
 
-If font awesome or the built in custom icon set configurator do not meet your needs you can also create your own custom icon set and load it using hooks provided by the plugin.
+= How it works =
 
-The plugin simply inserts icons in the following HTML format:
+Pick an icon from the toolbar while editing any rich text field. The plugin inserts a small HTML tag that gets styled by the chosen icon set.
 
-`
-<i class="icon fa fa-address-book" aria-hidden="true"> </i>
-`
+= Why use a custom SVG icon set? =
 
-The CSS class names and available icons can be all be modified to your liking if you are prepared to write some PHP hooks for your WordPress theme. Please note that you should keep the plugin settings set to use 'Font Awesome 4.7'. 
-If you would like to load a custom created webfont or icon set you crafted yourself please read on. If you have the SVG files you can set the plugin settings to 'Custom SVG icon set' and upload your SVG files from the plugin settings.
+When you use a custom SVG icon set, the plugin defaults to **inline SVG rendering**. This is a great choice for performance! Google PageSpeed Insights will thank you.
 
-**CSS file** 
-A slightly customized version of the Font Awesome 4.7 CSS file is loaded by default on the front end and backend to make the plugin work out of the box, but you can also choose Font Awesome Free version 5.x or 6.x from the settings screen. 
-If you want to use a custom created icon set it is advised to overide the icon set json file and CSS file using hooks provided by this plugin.
+* **Better page speed** - No render-blocking CSS or font files to download. Icons are part of the HTML itself.
+* **Only loads what you use** - Unlike Font Awesome which loads CSS for hundreds of icons, inline SVG only includes the icons that are actually on the page.
+* **No external requests** - Everything is served inline, so there are no extra HTTP requests for font or CSS files.
+* **Inherits text color** - Icons automatically use the surrounding text color, no extra CSS needed.
+* **Fully reversible** - The stored content in the database is not modified. You can switch between render technologies at any time from the plugin settings if you want to.
 
-**Custom icon set file** 
-If the plugin is set to Font Awesome 4.7 icon set (default behaviour) the icons are loaded from: wp-content/plugins/jvm-richtext-insert-icons/dist/fa-4.7/icons.json. The json file contains all css classes that can be turned into icons by Font Awesome 4.7 CSS file. You can load a custom json icon set file  by calling a filter hook in your (child) theme functions.php. 
-For example:
+Alternative render technologies (CSS masks, ::before / ::after pseudo-elements) are also available for custom SVG icons if your use case requires it.
 
-`
-function add_my_icons($file) {
-    $file = get_stylesheet_directory().'/path_to_my/icons.json';
-    return $file;
-}
+= For developers =
 
-add_filter( 'jvm_richtext_icons_iconset_file', 'add_my_icons');
-`
+The plugin provides several filter hooks to customize its behavior. You can load your own icon set, CSS file, or change the icon class prefix. The icon config file can also be in Fontello format (see <https://fontello.com>).
 
-The icon config file can also be in fontello format since version 1.0.3. Have a look at: <https://fontello.com> to create your customized icon set.
-
-**Custom CSS file** 
-By default the Font Awesome 4.7 CSS is loaded from: wp-content/plugins/jvm-richtext-insert-icons/dist/fa-4.7/font-awesome.min.css. You can load a custom CSS file for your icon set by calling a filter hook in your (child) theme functions.php. 
-For example:
+**Load a custom icon set file**
 
 `
-function add_my_css($cssfile) {
-    $cssfile = get_stylesheet_directory_uri().'/path_to_my/cssfile.css';
-    return $cssfile;
-}
-
-add_filter( 'jvm_richtext_icons_css_file', 'add_my_css');
+add_filter( 'jvm_richtext_icons_iconset_file', function($file) {
+    return get_stylesheet_directory() . '/path_to_my/icons.json';
+});
 `
 
-If you choose the load your own CSS file and want to disable the default CSS file use the following code:
+**Load a custom CSS file**
+
+`
+add_filter( 'jvm_richtext_icons_css_file', function($cssfile) {
+    return get_stylesheet_directory_uri() . '/path_to_my/cssfile.css';
+});
+`
+
+To disable the default CSS file entirely:
 
 `
 add_filter( 'jvm_richtext_icons_css_file', '__return_false');
 `
-All icon markup has the classname "icon" prefixed to the icon HTML inserted. If you want to use some other prefix you can add a filter. Like this:
+
+**Change the icon class prefix**
 
 `
-function my_icon_class($css_class_name) {
+add_filter( 'jvm_richtext_icons_base_class', function() {
     return 'my-custom-css-class-name';
-}
-
-add_filter( 'jvm_richtext_icons_base_class', 'my_icon_class');
+});
 `
 
-Use this hook to disable the entire plugin settings screen that was added in 1.0.9:
+**Disable the settings screen**
+
 `
-add_filter('jvm_richtext_icons_show_settings', '__return_false');
+add_filter( 'jvm_richtext_icons_show_settings', '__return_false');
 `
 
-Please note that settings will still be loaded so please make sure you have set the settings to default font awesome if you are loading a custom icon set with the plugin hooks.
+Please note that if you are loading a custom icon set with the plugin hooks, you should keep the plugin settings set to "Font Awesome 4.7" (default).
 
 == Changelog ==
+
+= 1.4.0 =
+* New render technology: Inline SVG. When using a custom SVG icon set you can now choose "Inline SVG" as render technology. This replaces the `<i>` tags with inline `<svg>` elements on the frontend using output buffering. Benefits: no CSS overhead for unused icons, only icons that are actually on the page are included, and icons inherit the current text color via `fill: currentColor`. The block editor continues to use CSS-based rendering so icons remain visible while editing. The stored HTML in the database is not modified, so you can switch back to any CSS-based technology at any time.
+* Migrated build tooling from the deprecated cgb-scripts (Create Guten Block) to @wordpress/scripts. JavaScript source files now use proper `@wordpress/*` package imports, and the build generates a `blocks.asset.php` file for automatic dependency management.
+* Fixed "acf is not defined" error on admin screens where Advanced Custom Fields is not active.
+* Code quality review of the entire codebase: added settings sanitization with whitelisted values, added capability checks in AJAX handlers, improved error handling for file operations and JSON parsing, fixed a text domain typo, and replaced deprecated PHP syntax.
 
 = 1.3.7 =
 Tested on WordPress 6.9
@@ -177,7 +177,7 @@ Fixed the styling of the editor pop-over. It was to large since WordPress 5.9.
 The addon is now also loaded in the widget screen (widget.php)
 
 = 1.0.5 =
-Added a hook for modifying the editor javascript file loaded for advanced users. 
+Added a hook for modifying the editor javascript file loaded for advanced users.
 Example usage:
 
 `
@@ -204,6 +204,3 @@ Php error fix for some php versions on plugin activation.
 
 = 1.0.0 =
 Initial release
-
-= Stable =
-1.0.0

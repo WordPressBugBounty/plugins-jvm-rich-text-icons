@@ -7,11 +7,11 @@ if( ! defined( 'ABSPATH' ) ) exit;
 if( !class_exists('JVM_acf_plugin_jvm_rich_text_icons') )  {
 
 class JVM_acf_plugin_jvm_rich_text_icons {
-    
+
     // vars
-    var $settings;
-    
-    
+    public $settings;
+
+
     /*
     *  __construct
     *
@@ -23,9 +23,9 @@ class JVM_acf_plugin_jvm_rich_text_icons {
     *  @param   void
     *  @return  void
     */
-    
+
     public function __construct() {
-        
+
         // settings
         // - these will be passed into the field class.
         $this->settings = array(
@@ -33,8 +33,8 @@ class JVM_acf_plugin_jvm_rich_text_icons {
             'url'       => plugin_dir_url( __FILE__ ),
             'path'      => plugin_dir_path( __FILE__ )
         );
-        
-        
+
+
         // include field
         add_action('acf/include_field_types',   array($this, 'include_field')); // v5
 
@@ -42,7 +42,7 @@ class JVM_acf_plugin_jvm_rich_text_icons {
         add_action( 'wp_ajax_acf/fields/jvm-richtext-insert-icons/query', array( $this, 'select2_ajax_request' ) );
         add_action( 'acf/input/admin_footer', array( $this, 'fix_select2_html') );
     }
-    
+
 
     public function select2_ajax_request () {
         if ( ! acf_verify_ajax() ) {
@@ -67,7 +67,7 @@ class JVM_acf_plugin_jvm_rich_text_icons {
                     'id' => $ic,
                     'text' => '<i class="'.$css_class.' '.$ic. '" aria-hidden="true"></i> '.$ic
                 ];
-            }     
+            }
         }
 
         $response = [
@@ -82,9 +82,10 @@ class JVM_acf_plugin_jvm_rich_text_icons {
     public function fix_select2_html () {
         if (!is_admin()) {
             return;
-        }       
+        }
 
         echo '<script>
+          if (typeof acf === \'undefined\') { /* ACF not loaded on this screen */ } else
           acf.add_filter(\'select2_args\', function(args) {
             args.templateSelection = function(selection) {
               var $selection = jQuery(\'<span class="acf-selection"></span>\');
@@ -108,7 +109,7 @@ class JVM_acf_plugin_jvm_rich_text_icons {
           });
         </script>';
     }
-    
+
 
     public function load_admin_assets() {
         $js_file = apply_filters('jvm_richtext_icons_editor_js_file', plugins_url( '/dist/acf.js', dirname( __FILE__ ) ));
@@ -137,21 +138,21 @@ class JVM_acf_plugin_jvm_rich_text_icons {
     *  @param   $version (int) major ACF version. Defaults to false
     *  @return  void
     */
-    
+
     public function include_field( $version = false ) {
-        
+
         // support empty $version
         if( !$version ) $version = 5;
-        
-        
+
+
         // load textdomain
-        load_plugin_textdomain( 'jvm-richtext-insert-icons', false, plugin_basename( dirname( __FILE__ ) ) . '/lang' ); 
-        
-        
+        load_plugin_textdomain( 'jvm-richtext-insert-icons', false, plugin_basename( dirname( __FILE__ ) ) . '/lang' );
+
+
         // include
         include_once('fields/class-jvm_acf_jvm_rich_text_icons' . $version . '.php');
     }
-    
+
 }
 
 

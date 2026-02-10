@@ -28,6 +28,7 @@ class JVM_Richtext_icons {
         add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_assets') );
         add_filter( 'plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2 );
         add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
+        add_action( 'template_redirect', array( $this, 'maybe_start_inline_svg_buffer' ) );
 
 
         /**
@@ -131,19 +132,19 @@ class JVM_Richtext_icons {
      * Enqueue Gutenberg block assets for both admin backend.
      */
     public function load_admin_assets($hook_suffix) {
-        if( 'post.php' == $hook_suffix 
-            || 'post-new.php' == $hook_suffix 
+        if( 'post.php' == $hook_suffix
+            || 'post-new.php' == $hook_suffix
             || 'widgets.php' == $hook_suffix
             || 'site-editor.php' == $hook_suffix) {
 
             // Register block editor script for backend.
+            $asset_file = include plugin_dir_path( __DIR__ ) . 'dist/blocks.asset.php';
             wp_enqueue_script(
-                'jvm-rich-text-icons-js', // Handle.
-                plugins_url( '/dist/blocks.build.js', dirname( __FILE__ ) ), // Block.build.js: We register the block here. Built with Webpack.
-                array(),
-                //array( 'wp-i18n', 'wp-element', 'wp-editor' ), // Dependencies, defined above.
-                '1.2.3',
-                true // Enqueue the script in the footer.
+                'jvm-rich-text-icons-js',
+                plugins_url( '/dist/blocks.js', dirname( __FILE__ ) ),
+                $asset_file['dependencies'],
+                $asset_file['version'],
+                true
             );
 
             // Register block editor styles for backend.
@@ -180,12 +181,17 @@ class JVM_Richtext_icons {
         if (isset($settings['icon_set'])) {
             $icon_set = $settings['icon_set'];
         }
-        
+
         if ($icon_set == 'custom-svg') {
             wp_register_style('jvm-rich-text-icons-svg', false);
             wp_enqueue_style( 'jvm-rich-text-icons-svg' );
 
-            wp_add_inline_style('jvm-rich-text-icons-svg', JVM_Richtext_icons::parse_dynamic_css());
+            if ($settings['technology'] == 'inline-svg' && !is_admin()) {
+                wp_add_inline_style('jvm-rich-text-icons-svg', 'svg.icon{width:1em;height:1em;display:inline-block;vertical-align:-0.125em;fill:currentColor}');
+            } else {
+                // In admin/editor always load mask-based CSS so <i> tags render correctly
+                wp_add_inline_style('jvm-rich-text-icons-svg', JVM_Richtext_icons::parse_dynamic_css());
+            }
         }else {
 
             $folder = $icon_set;
@@ -210,6 +216,68 @@ class JVM_Richtext_icons {
     }
 
     /**
+     * Start output buffering for inline SVG replacement on the frontend.
+     */
+    public function maybe_start_inline_svg_buffer() {
+        $settings = self::get_settings();
+        if ($settings['icon_set'] == 'custom-svg' && $settings['technology'] == 'inline-svg') {
+            ob_start(array($this, 'replace_icons_with_inline_svg'));
+        }
+    }
+
+    /**
+     * Replace <i class="icon icon-name"> tags with inline SVG elements.
+     * @param string $html
+     * @return string
+     */
+    public function replace_icons_with_inline_svg($html) {
+        $prefix = self::get_class_prefix();
+        $svg_dir = self::get_svg_directory();
+        static $svg_cache = [];
+
+        $html = preg_replace_callback(
+            '/<i\b([^>]*)\bclass="' . preg_quote($prefix, '/') . ' ([^"]*)"([^>]*)>\s*<\/i>/',
+            function ($matches) use ($prefix, $svg_dir, &$svg_cache) {
+                $classes = $matches[2];
+                $extra_attrs = trim($matches[1] . ' ' . $matches[3]);
+                // Remove aria-hidden from extra attrs since we add it ourselves
+                $extra_attrs = preg_replace('/\s*aria-hidden="[^"]*"/', '', $extra_attrs);
+                $extra_attrs = trim($extra_attrs);
+
+                // The last class is the icon name (e.g. "fas fa-location-dot" -> "fa-location-dot")
+                $class_parts = explode(' ', $classes);
+                $icon_name = end($class_parts);
+
+                if (!isset($svg_cache[$icon_name])) {
+                    $file = $svg_dir . $icon_name . '.svg';
+                    if (file_exists($file)) {
+                        $svg_cache[$icon_name] = file_get_contents($file);
+                    } else {
+                        $svg_cache[$icon_name] = false;
+                    }
+                }
+
+                if ($svg_cache[$icon_name] === false) {
+                    return $matches[0];
+                }
+
+                $svg = $svg_cache[$icon_name];
+                // Add class, aria-hidden and any extra attributes (e.g. style) to the SVG element
+                $attrs = 'class="' . esc_attr($prefix . ' ' . $classes) . '" aria-hidden="true"';
+                if (!empty($extra_attrs)) {
+                    $attrs .= ' ' . $extra_attrs;
+                }
+                $svg = preg_replace('/<svg\b/', '<svg ' . $attrs, $svg, 1);
+
+                return $svg;
+            },
+            $html
+        );
+
+        return $html;
+    }
+
+    /**
      * Get the class prefix for the css
      * @return [string]
      */
@@ -228,7 +296,7 @@ class JVM_Richtext_icons {
         if (isset($settings['icon_set'])) {
             $icon_set = $settings['icon_set'];
         }
-        
+
 
         if ($icon_set == 'custom-svg') {
                 $svg_files = self::get_svg_file_list();
@@ -252,6 +320,9 @@ class JVM_Richtext_icons {
             if (file_exists($iconFile)) {
                 $iconData = file_get_contents($iconFile);
                 $data = json_decode($iconData);
+                if ($data === null) {
+                    return $icons;
+                }
                 $icons = [];
                 // Check if data is fontello format
                 if (isset($data->glyphs)) {
@@ -262,8 +333,8 @@ class JVM_Richtext_icons {
                     $icons = $data;
                 }
 
-                $icons = apply_filters('jvm_richtext_icons_iconset', $icons);            
-            }            
+                $icons = apply_filters('jvm_richtext_icons_iconset', $icons);
+            }
         }
 
         return $icons;
@@ -309,7 +380,7 @@ class JVM_Richtext_icons {
             ob_start();
 
             include plugin_dir_path( __DIR__ ).'views/'.$fileName;
-            
+
             $out = ob_get_clean();
 
             return $out;

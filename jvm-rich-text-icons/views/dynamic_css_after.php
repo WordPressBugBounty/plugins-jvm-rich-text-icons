@@ -1,5 +1,5 @@
 .wp-block {
-    /* Fixes the iframe site editor */   
+    /* Fixes the iframe site editor */
 }
 <?php
 $prefix_class = JVM_Richtext_icons::get_class_prefix();
@@ -13,14 +13,14 @@ i.<?php echo $prefix_class;?> {
     line-height: 1;
 }
 i.<?php echo $prefix_class;?>:after {
-    content: '';    
+    content: '';
     position: absolute;
     height: 100%;
     width: 100%;
     top: 0;
     left: 0;
-    background-color: currentColor; 
-    mask-repeat: no-repeat; 
+    background-color: currentColor;
+    mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-repeat: no-repeat;
     mask-size:contain;
@@ -28,12 +28,13 @@ i.<?php echo $prefix_class;?>:after {
     mask-position: 50% 50%;
     -webkit-mask-position: 50% 50%;
 }
-<?php 
+<?php
     foreach ($files as $file) {
         $pi = pathinfo($file);
-        
+
         $icon_class = sanitize_title($pi['filename']);
         $file_content = file_get_contents($file);
+        if ($file_content === false) { continue; }
 ?>
 i.<?php echo $prefix_class;?>.<?php echo $icon_class;?>:after {
     --icon-bg: url("data:image/svg+xml;base64,<?php echo base64_encode($file_content);?>");
