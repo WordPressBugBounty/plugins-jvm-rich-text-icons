@@ -398,7 +398,7 @@ class JVM_Richtext_icons {
         }
 
         if (!isset($settings['technology'])) {
-            $settings['technology'] = 'html-css';
+            $settings['technology'] = 'inline-svg';
         }
 
         return $settings;

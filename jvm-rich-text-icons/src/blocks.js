@@ -2,15 +2,12 @@ import { __ } from "@wordpress/i18n";
 import { registerFormatType } from "@wordpress/rich-text";
 import { Fragment } from "@wordpress/element";
 import { registerBlockType } from "@wordpress/blocks";
-import { InspectorControls } from "@wordpress/block-editor";
-import {
-  PanelBody,
-  ComboboxControl,
-  RangeControl,
-} from "@wordpress/components";
+import { InspectorControls, useBlockProps } from "@wordpress/block-editor";
+import { PanelBody, RangeControl } from "@wordpress/components";
 import domReady from "@wordpress/dom-ready";
 
 import IconMap from "./controls";
+import IconPicker from "./icon-picker";
 
 /**
  * Block constants
@@ -52,6 +49,17 @@ registerBlockType("jvm/single-icon", {
   category: "common",
   keywords: [__("Icon")],
 
+  supports: {
+    color: {
+      text: true,
+      background: true,
+    },
+    spacing: {
+      margin: true,
+      padding: true,
+    },
+  },
+
   attributes: {
     icon: {
       type: "string",
@@ -64,17 +72,9 @@ registerBlockType("jvm/single-icon", {
 
   edit: (props) => {
     let icons = jvm_richtext_icon_settings.iconset;
-    let options = [];
     let selectectValue = "";
     let currentFontSize = 32;
     let classPrefix = jvm_richtext_icon_settings.base_class;
-
-    for (let icon of icons) {
-      options.push({
-        value: icon,
-        label: icon,
-      });
-    }
 
     // Get the current or first icon
     if (props.attributes.icon !== undefined) {
@@ -90,66 +90,54 @@ registerBlockType("jvm/single-icon", {
       currentFontSize = props.attributes.fontSize;
     }
 
-    // Update the proerties
+    // Update the properties
     props.setAttributes({ icon: selectectValue, fontSize: currentFontSize });
 
     let cssClass = classPrefix + " " + props.attributes.icon;
     let cssStyle = { fontSize: props.attributes.fontSize + "px" };
 
-    return [
-      <InspectorControls>
-        <PanelBody label={__("Icon")}>
-          <ComboboxControl
-            label={__("Icon")}
-            value={selectectValue}
-            onChange={(i) => {
-              if (i) {
-                props.setAttributes({ icon: i });
-              }
-            }}
-            options={options}
-            __experimentalRenderItem={(opt) => {
-              let cssClass = classPrefix + " " + opt.item.value;
-              return (
-                <span>
-                  <i class={cssClass} aria-hidden="true">
-                    {" "}
-                  </i>{" "}
-                  {opt.item.value}
-                </span>
-              );
-            }}
-            isMulti="false"
-          />
-          <RangeControl
-            label={__("Font Size (px)")}
-            value={currentFontSize}
-            min="10"
-            max="200"
-            onChange={(i) => {
-              if (i) {
-                props.setAttributes({ fontSize: i });
-              }
-            }}
-          />
-        </PanelBody>
-      </InspectorControls>,
+    const blockProps = useBlockProps();
 
-      <div className={props.className}>
-        <i class={cssClass} aria-hidden="true" style={cssStyle}>
-          {" "}
-        </i>
-      </div>,
-    ];
+    return (
+      <>
+        <InspectorControls>
+          <PanelBody label={__("Icon")}>
+            <IconPicker
+              icons={icons}
+              classPrefix={classPrefix}
+              selectedIcon={selectectValue}
+              onSelect={(iconName) => props.setAttributes({ icon: iconName })}
+            />
+            <RangeControl
+              label={__("Font Size (px)")}
+              value={currentFontSize}
+              min={10}
+              max={200}
+              onChange={(size) => {
+                if (size) {
+                  props.setAttributes({ fontSize: size });
+                }
+              }}
+            />
+          </PanelBody>
+        </InspectorControls>
+        <div {...blockProps}>
+          <i className={cssClass} aria-hidden="true" style={cssStyle}>
+            {" "}
+          </i>
+        </div>
+      </>
+    );
   },
 
   save: (props) => {
+    const blockProps = useBlockProps.save();
     let classPrefix = jvm_richtext_icon_settings.base_class;
     let cssClass = classPrefix + " " + props.attributes.icon;
     let cssStyle = { fontSize: props.attributes.fontSize + "px" };
     return (
-      <div className={props.className}>
-        <i class={cssClass} aria-hidden="true" style={cssStyle}>
+      <div {...blockProps}>
+        <i className={cssClass} aria-hidden="true" style={cssStyle}>
           {" "}
         </i>
       </div>

@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=VXZJG9GC34JJU
 Tags: icon, svg, font-awesome, gutenberg, icon-block
 Requires at least: 5.4
 Tested up to: 6.9
-Stable tag: 1.4.1
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Playground: true
@@ -82,6 +82,12 @@ add_filter( 'jvm_richtext_icons_show_settings', '__return_false');
 Please note that if you are loading a custom icon set with the plugin hooks, you should keep the plugin settings set to "Font Awesome 4.7" (default).
 
 == Changelog ==
+
+= 1.5.0 =
+* New visual icon picker for the single icon block. Replaced the dropdown with a searchable icon grid with tooltips — the same style as the rich text toolbar picker. Both pickers now share a single reusable IconPicker component.
+* Added padding and margin controls to the single icon block via native WordPress block supports.
+* Migrated the single icon block to useBlockProps for better compatibility with WordPress block features.
+* Fixed the icon search bar in the rich text toolbar popover scrolling out of view. The search bar now stays fixed at the top while the icon grid scrolls.
 
 = 1.4.1 =
 * Added a friendly review notice that appears after 14 days of use. Can be permanently dismissed.
