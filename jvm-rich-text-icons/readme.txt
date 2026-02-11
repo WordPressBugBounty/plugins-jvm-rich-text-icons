@@ -84,7 +84,7 @@ Please note that if you are loading a custom icon set with the plugin hooks, you
 == Changelog ==
 
 = 1.5.0 =
-* New visual icon picker for the single icon block. Replaced the dropdown with a searchable icon grid with tooltips — the same style as the rich text toolbar picker. Both pickers now share a single reusable IconPicker component.
+* New visual icon picker for the single icon block. Replaced the dropdown with a searchable icon grid with tooltips. The same style as the rich text toolbar picker. Both pickers now share a single reusable IconPicker component.
 * Added padding and margin controls to the single icon block via native WordPress block supports.
 * Migrated the single icon block to useBlockProps for better compatibility with WordPress block features.
 * Fixed the icon search bar in the rich text toolbar popover scrolling out of view. The search bar now stays fixed at the top while the icon grid scrolls.
