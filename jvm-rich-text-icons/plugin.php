@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: JVM Rich Text Icons
- * Description: Add Font Awesome icons, or (SVG) icons from a custom icon set to the WordPress block editor.
- * Version: 1.4.0
+ * Description: Insert icons anywhere in your content. Inline in text, as a block, or in ACF fields. Includes Font Awesome and supports custom SVG icons.
+ * Version: 1.4.1
  * Author: Joris van Montfort
  * Author URI: https://jorisvm.nl
  * Text Domain: jvm-richtext-icons
@@ -10,7 +10,7 @@
  *
  * @category Gutenberg
  * @author Joris van Montfort
- * @version 1.4.0
+ * @version 1.4.1
  * @package JVM Rich Text Icons
  */
 
@@ -25,6 +25,13 @@ require_once plugin_dir_path( __FILE__ ) . 'src/init.php';
 if (is_admin()) {
    require_once plugin_dir_path( __FILE__ ) . 'src/settings.php';
 }
+
+// Track activation date for review notice timing.
+register_activation_hook(__FILE__, function() {
+    if (!get_option('jvm_richtext_icons_activated')) {
+        update_option('jvm_richtext_icons_activated', time());
+    }
+});
 
 // Load the ACF field only for sites using the ACF plugin.
 if (function_exists('the_field')) {

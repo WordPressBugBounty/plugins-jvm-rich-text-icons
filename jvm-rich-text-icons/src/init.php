@@ -29,6 +29,8 @@ class JVM_Richtext_icons {
         add_filter( 'plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2 );
         add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
         add_action( 'template_redirect', array( $this, 'maybe_start_inline_svg_buffer' ) );
+        add_action( 'admin_notices', array( $this, 'maybe_show_review_notice' ) );
+        add_action( 'wp_ajax_jvm_richtext_dismiss_review', array( $this, 'dismiss_review_notice' ) );
 
 
         /**
@@ -275,6 +277,45 @@ class JVM_Richtext_icons {
         );
 
         return $html;
+    }
+
+    /**
+     * Show a review notice after 14 days of use.
+     */
+    public function maybe_show_review_notice() {
+        if (get_option('jvm_richtext_icons_review_dismissed')) {
+            return;
+        }
+
+        $activated = get_option('jvm_richtext_icons_activated');
+        if (!$activated) {
+            // Existing installs that never triggered the activation hook
+            update_option('jvm_richtext_icons_activated', time());
+            return;
+        }
+        if ((time() - $activated) < 14 * DAY_IN_SECONDS) {
+            return;
+        }
+
+        echo '<div class="notice notice-info is-dismissible jvm-richtext-review-notice">';
+        echo '<p>';
+        echo sprintf(
+            __('Enjoying %1$s? Please consider %2$sleaving a review%3$s — it helps other WordPress users find this plugin.', 'jvm-rich-text-icons'),
+            '<strong>JVM Rich Text Icons</strong>',
+            '<a href="https://wordpress.org/support/plugin/jvm-rich-text-icons/reviews/#new-post" target="_blank">',
+            '</a>'
+        );
+        echo '</p>';
+        echo '</div>';
+        echo '<script>jQuery(document).on("click",".jvm-richtext-review-notice .notice-dismiss",function(){jQuery.post(ajaxurl,{action:"jvm_richtext_dismiss_review"})});</script>';
+    }
+
+    /**
+     * AJAX handler to permanently dismiss the review notice.
+     */
+    public function dismiss_review_notice() {
+        update_option('jvm_richtext_icons_review_dismissed', true);
+        wp_send_json_success();
     }
 
     /**

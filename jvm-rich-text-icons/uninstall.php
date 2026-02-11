@@ -19,3 +19,5 @@ if (is_dir($upload_dir_files)) {
 
 // Delete the settings
 delete_option('jvm-rich-text-icons');
+delete_option('jvm_richtext_icons_activated');
+delete_option('jvm_richtext_icons_review_dismissed');

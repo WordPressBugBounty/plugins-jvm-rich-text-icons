@@ -1,15 +1,15 @@
 === JVM Gutenberg Rich Text Icons ===
 Contributors: jorisvanmontfort
 Donate link: https://www.paypal.com/donate/?hosted_button_id=VXZJG9GC34JJU
-Tags: gutenberg, SVG, icon, font awesome, ACF
+Tags: icon, svg, font-awesome, gutenberg, icon-block
 Requires at least: 5.4
 Tested up to: 6.9
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Playground: true
 
-Add Font Awesome icons, or icons from a custom icon set to rich text fields anywhere in the Gutenberg block editor!
+Insert icons anywhere in your content — inline in text, headings, buttons, or as a standalone block.
 
 == Description ==
 
@@ -82,6 +82,10 @@ add_filter( 'jvm_richtext_icons_show_settings', '__return_false');
 Please note that if you are loading a custom icon set with the plugin hooks, you should keep the plugin settings set to "Font Awesome 4.7" (default).
 
 == Changelog ==
+
+= 1.4.1 =
+* Added a friendly review notice that appears after 14 days of use. Can be permanently dismissed.
+* Updated plugin description and tagline.
 
 = 1.4.0 =
 * New render technology: Inline SVG. When using a custom SVG icon set you can now choose "Inline SVG" as render technology. This replaces the `<i>` tags with inline `<svg>` elements on the frontend using output buffering. Benefits: no CSS overhead for unused icons, only icons that are actually on the page are included, and icons inherit the current text color via `fill: currentColor`. The block editor continues to use CSS-based rendering so icons remain visible while editing. The stored HTML in the database is not modified, so you can switch back to any CSS-based technology at any time.
