@@ -178,6 +178,12 @@ class JVM_Richtext_icons {
      */
     public static function load_css() {
         $settings = self::get_settings();
+
+        $load_default_css = apply_filters('jvm_richtext_icons_load_default_css', true, $settings);
+        if (!$load_default_css) {
+            return;
+        }
+
         $icons = [];
         $icon_set = 'default';
         if (isset($settings['icon_set'])) {
@@ -222,7 +228,10 @@ class JVM_Richtext_icons {
      */
     public function maybe_start_inline_svg_buffer() {
         $settings = self::get_settings();
-        if ($settings['icon_set'] == 'custom-svg' && $settings['technology'] == 'inline-svg') {
+        $use_inline_svg = ($settings['icon_set'] == 'custom-svg' && $settings['technology'] == 'inline-svg');
+        $use_inline_svg = apply_filters('jvm_richtext_icons_use_inline_svg', $use_inline_svg, $settings);
+
+        if ($use_inline_svg) {
             ob_start(array($this, 'replace_icons_with_inline_svg'));
         }
     }
@@ -234,12 +243,14 @@ class JVM_Richtext_icons {
      */
     public function replace_icons_with_inline_svg($html) {
         $prefix = self::get_class_prefix();
-        $svg_dir = self::get_svg_directory();
+        $svg_dirs = apply_filters('jvm_richtext_icons_svg_directories', [
+            'default' => self::get_svg_directory()
+        ]);
         static $svg_cache = [];
 
         $html = preg_replace_callback(
             '/<i\b([^>]*)\bclass="' . preg_quote($prefix, '/') . ' ([^"]*)"([^>]*)>\s*<\/i>/',
-            function ($matches) use ($prefix, $svg_dir, &$svg_cache) {
+            function ($matches) use ($prefix, $svg_dirs, &$svg_cache) {
                 $classes = $matches[2];
                 $extra_attrs = trim($matches[1] . ' ' . $matches[3]);
                 // Remove aria-hidden from extra attrs since we add it ourselves
@@ -251,11 +262,13 @@ class JVM_Richtext_icons {
                 $icon_name = end($class_parts);
 
                 if (!isset($svg_cache[$icon_name])) {
-                    $file = $svg_dir . $icon_name . '.svg';
-                    if (file_exists($file)) {
-                        $svg_cache[$icon_name] = file_get_contents($file);
-                    } else {
-                        $svg_cache[$icon_name] = false;
+                    $svg_cache[$icon_name] = false;
+                    foreach ($svg_dirs as $dir) {
+                        $file = $dir . $icon_name . '.svg';
+                        if (file_exists($file)) {
+                            $svg_cache[$icon_name] = file_get_contents($file);
+                            break;
+                        }
                     }
                 }
 

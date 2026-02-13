@@ -226,16 +226,19 @@ class JVM_Richtext_icons_settings {
             'icon_set', // ID
             __('Icon set', 'jvm-rich-text-icons'), // Title
             function () {
-                echo '<select id="jvm-rich-text-icons_icon_set" name="jvm-rich-text-icons[icon_set]">';
+                $icon_sets = [
+                    'default'    => __('Font Awesome 4.7', 'jvm-rich-text-icons'),
+                    'fa-5'       => __('Font Awesome Free 5.15.4', 'jvm-rich-text-icons'),
+                    'fa-6'       => __('Font Awesome Free 6.7.2', 'jvm-rich-text-icons'),
+                    'custom-svg' => __('Custom SVG icon set', 'jvm-rich-text-icons'),
+                ];
+                $icon_sets = apply_filters('jvm_richtext_icons_available_icon_sets', $icon_sets);
 
-                $checked = $this->options['icon_set'] == 'default' ? ' selected' : '';
-                echo '<option value="default"'.$checked.'>'.__('Font Awsome 4.7', 'jvm-rich-text-icons').'</option>';
-                $checked = $this->options['icon_set'] == 'fa-5' ? ' selected' : '';
-                echo '<option value="fa-5"'.$checked.'>'.__('Font Awsome Free 5.15.4', 'jvm-rich-text-icons').'</option>';
-                $checked = $this->options['icon_set'] == 'fa-6' ? ' selected' : '';
-                echo '<option value="fa-6"'.$checked.'>'.__('Font Awsome Free 6.7.2', 'jvm-rich-text-icons').'</option>';
-                $checked = $this->options['icon_set'] == 'custom-svg' ? ' selected' : '';
-                echo '<option value="custom-svg"'.$checked.'>'.__('Custom SVG icon set', 'jvm-rich-text-icons').'</option>';
+                echo '<select id="jvm-rich-text-icons_icon_set" name="jvm-rich-text-icons[icon_set]">';
+                foreach ($icon_sets as $value => $label) {
+                    $selected = selected($this->options['icon_set'], $value, false);
+                    echo '<option value="' . esc_attr($value) . '"' . $selected . '>' . esc_html($label) . '</option>';
+                }
                 echo '</select>';
             },
             'jvm-rich-text-icons', // Page
@@ -287,6 +290,7 @@ class JVM_Richtext_icons_settings {
         $sanitized = [];
 
         $valid_icon_sets = ['default', 'fa-5', 'fa-6', 'custom-svg'];
+        $valid_icon_sets = apply_filters('jvm_richtext_icons_valid_icon_sets', $valid_icon_sets);
         if (isset($input['icon_set']) && in_array($input['icon_set'], $valid_icon_sets, true)) {
             $sanitized['icon_set'] = $input['icon_set'];
         }

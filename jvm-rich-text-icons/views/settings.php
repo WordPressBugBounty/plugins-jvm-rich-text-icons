@@ -10,13 +10,15 @@
         $settings = JVM_Richtext_icons::get_settings();
     ?>
     </form>
+    <?php do_action('jvm_richtext_icons_settings_after_form', $settings); ?>
     <div id="jvm-rich-text-icons_custom_icon_generator" <?php echo $settings['icon_set'] != "custom-svg" ? ' style="display: none;"' : "";?>>
         <h2 class="title"><?php _e('Custom SVG icon set', 'jvm-rich-text-icons');?></h2><a id="add_icon_btn" href="#" class="page-title-action"><?php _e('Add Icon', 'jvm-rich-text-icons');?></a>
         <?php
             echo JVM_Richtext_icons::render_view('uploader.php');
-            echo JVM_Richtext_icons::render_view('icon-list.php');  
+            echo JVM_Richtext_icons::render_view('icon-list.php');
         ?>
     </div>
+    <?php do_action('jvm_richtext_icons_settings_after_icons', $settings); ?>
     <form action="https://www.paypal.com/donate" method="post" target="_top">
         <p style="max-width: 500px;">
             I am Joris van Montfort and I created and maintain the free plugin <strong>JVM Rich Text Icons</strong> for you. If you like using this plugin and want to keep this plugin free, please donate a small amount of money. Thank you!
