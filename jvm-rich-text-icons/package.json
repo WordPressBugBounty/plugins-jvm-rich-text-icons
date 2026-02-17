@@ -7,6 +7,8 @@
     "build": "webpack --config webpack.config.js"
   },
   "devDependencies": {
-    "@wordpress/scripts": "^31.4.0"
+    "@wordpress/scripts": "^31.4.0",
+    "webpack": "^5.105.1",
+    "webpack-cli": "^6.0.1"
   }
 }

@@ -27,6 +27,7 @@ class JVM_Richtext_icons_settings {
             if ($show_settings) {
                 add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
                 add_action( 'admin_init', array( $this, 'page_init' ) );
+                add_action( 'admin_init', array( $this, 'register_technology_field' ), 30 );
                 add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ));
 
                 // Ajax calls
@@ -50,7 +51,8 @@ class JVM_Richtext_icons_settings {
                     $iconFileDefault = plugin_dir_path( __DIR__ ).'src/icons.json';
                     $iconFileLoaded = apply_filters('jvm_richtext_icons_iconset_file', $iconFileDefault);
 
-                    if ($iconFileDefault != $iconFileLoaded) {
+                    $show_custom_notice = apply_filters('jvm_richtext_icons_show_custom_iconset_notice', $iconFileDefault != $iconFileLoaded, $iconFileLoaded);
+                    if ($show_custom_notice) {
                         echo '<div class="notice notice-warning">';
                         echo '<p>'.sprintf(__("A custom icon set is being loaded from: %s. Keep your setting set to the default Font Awsome icon set to keep this working. The custom icon set can't be loaded if you are creating a SVG icon set from this page.", 'jvm-rich-text-icons'), $iconFileLoaded).'</p>';
                         echo '</div>';
@@ -230,7 +232,7 @@ class JVM_Richtext_icons_settings {
                     'default'    => __('Font Awesome 4.7', 'jvm-rich-text-icons'),
                     'fa-5'       => __('Font Awesome Free 5.15.4', 'jvm-rich-text-icons'),
                     'fa-6'       => __('Font Awesome Free 6.7.2', 'jvm-rich-text-icons'),
-                    'custom-svg' => __('Custom SVG icon set', 'jvm-rich-text-icons'),
+                    'custom-svg' => __('My SVG uploads', 'jvm-rich-text-icons'),
                 ];
                 $icon_sets = apply_filters('jvm_richtext_icons_available_icon_sets', $icon_sets);
 
@@ -245,35 +247,42 @@ class JVM_Richtext_icons_settings {
             'general' // Section
         );
 
-        if ($this->options['icon_set'] == 'custom-svg') {
-            add_settings_field(
-                'technology', // ID
-                __('Render technology', 'jvm-rich-text-icons'), // Title
-                function () {
-                    echo '<select name="jvm-rich-text-icons[technology]">';
-
-                    $checked = $this->options['technology'] == 'inline-svg' ? ' selected' : '';
-                    echo '<option value="inline-svg"'.$checked.'>'.__('Inline SVG', 'jvm-rich-text-icons').'</option>';
-
-                    $checked = $this->options['technology'] == 'html-css' ? ' selected' : '';
-                    echo '<option value="html-css"'.$checked.'>'.__('HTML + CSS', 'jvm-rich-text-icons').'</option>';
-                    $checked = $this->options['technology'] == 'html-css-before' ? ' selected' : '';
-                    echo '<option value="html-css-before"'.$checked.'>'.__('HTML + CSS ::before pseudo-element', 'jvm-rich-text-icons').'</option>';
-
-                    $checked = $this->options['technology'] == 'html-css-after' ? ' selected' : '';
-                    echo '<option value="html-css-after"'.$checked.'>'.__('HTML + CSS ::after pseudo-element', 'jvm-rich-text-icons').'</option>';
-
-                    echo '</select>';
-                },
-                'jvm-rich-text-icons', // Page
-                'general' // Section
-            );
-        }
-
         register_setting(
             'jvm-rich-text-icons', // Option group
             'jvm-rich-text-icons', // Option name
             array( $this, 'sanitize' ) // Sanitize
+        );
+    }
+
+    /**
+     * Register the technology field at priority 30 so it appears after
+     * any pro plugin fields (style, stroke width) registered at priority 20.
+     */
+    public function register_technology_field() {
+        $this->options = JVM_Richtext_icons::get_settings();
+
+        add_settings_field(
+            'technology', // ID
+            __('Render technology', 'jvm-rich-text-icons'), // Title
+            function () {
+                echo '<select name="jvm-rich-text-icons[technology]">';
+
+                $checked = $this->options['technology'] == 'inline-svg' ? ' selected' : '';
+                echo '<option value="inline-svg"'.$checked.'>'.__('Inline SVG', 'jvm-rich-text-icons').'</option>';
+
+                $checked = $this->options['technology'] == 'html-css' ? ' selected' : '';
+                echo '<option value="html-css"'.$checked.'>'.__('HTML + CSS', 'jvm-rich-text-icons').'</option>';
+                $checked = $this->options['technology'] == 'html-css-before' ? ' selected' : '';
+                echo '<option value="html-css-before"'.$checked.'>'.__('HTML + CSS ::before pseudo-element', 'jvm-rich-text-icons').'</option>';
+
+                $checked = $this->options['technology'] == 'html-css-after' ? ' selected' : '';
+                echo '<option value="html-css-after"'.$checked.'>'.__('HTML + CSS ::after pseudo-element', 'jvm-rich-text-icons').'</option>';
+
+                echo '</select>';
+            },
+            'jvm-rich-text-icons', // Page
+            'general', // Section
+            [ 'class' => 'jvm-rti-technology-row' ]
         );
     }
 
@@ -289,7 +298,7 @@ class JVM_Richtext_icons_settings {
     public function sanitize( $input ) {
         $sanitized = [];
 
-        $valid_icon_sets = ['default', 'fa-5', 'fa-6', 'custom-svg'];
+        $valid_icon_sets = ['default', 'fa-5', 'fa-6', 'fa-7', 'custom-svg'];
         $valid_icon_sets = apply_filters('jvm_richtext_icons_valid_icon_sets', $valid_icon_sets);
         if (isset($input['icon_set']) && in_array($input['icon_set'], $valid_icon_sets, true)) {
             $sanitized['icon_set'] = $input['icon_set'];

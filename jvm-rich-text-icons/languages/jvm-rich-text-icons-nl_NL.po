@@ -1,0 +1,144 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: JVM Rich Text Icons 1.5.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-16 15:03:01+0000\n"
+"PO-Revision-Date: 2026-02-16 15:03:01+0000\n"
+"Last-Translator: DeepL Auto Translation\n"
+"Language-Team: NL\n"
+"Language: nl_NL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+
+#: views/settings.php:2
+msgid "Rich Text Icons Settings"
+msgstr "Rich Text Icons Instellingen"
+
+#: views/settings.php:17
+#: src/settings.php:235
+msgid "My SVG uploads"
+msgstr "Mijn SVG-uploads"
+
+#: views/settings.php:17
+msgid "Add Icon"
+msgstr "Icoon toevoegen"
+
+#: views/uploader.php:43
+msgid "Drop SVG icons to upload"
+msgstr "Sleep SVG-iconen hierheen om te uploaden"
+
+#: views/icon-list.php:25
+msgid "No custom icons have been uploaded. Please upload some SVG files to create your custom icon set."
+msgstr "Er zijn nog geen eigen iconen geüpload. Upload SVG-bestanden om je eigen icoonset te maken."
+
+#: src/fields/class-jvm_acf_jvm_rich_text_icons5.php:38
+msgid "JVM Icon"
+msgstr "JVM Icoon"
+
+#: src/fields/class-jvm_acf_jvm_rich_text_icons5.php:81
+msgid "Default icon"
+msgstr "Standaard icoon"
+
+#: src/fields/class-jvm_acf_jvm_rich_text_icons5.php:87
+msgid "Choose a default icon (optional)"
+msgstr "Kies een standaard icoon (optioneel)"
+
+#: src/fields/class-jvm_acf_jvm_rich_text_icons5.php:95
+msgid "Return Value"
+msgstr "Returnwaarde"
+
+#: src/fields/class-jvm_acf_jvm_rich_text_icons5.php:96
+msgid "Specify the returned value on front end"
+msgstr "Bepaal de returnwaarde in de frontend"
+
+#: src/fields/class-jvm_acf_jvm_rich_text_icons5.php:100
+msgid "Icon Element"
+msgstr "Icoon element"
+
+#: src/fields/class-jvm_acf_jvm_rich_text_icons5.php:101
+msgid "Icon Class"
+msgstr "Icoon class"
+
+#: src/fields/class-jvm_acf_jvm_rich_text_icons5.php:106
+msgid "Allow Null?"
+msgstr "Null toestaan?"
+
+#: src/fields/class-jvm_acf_jvm_rich_text_icons5.php:111
+msgid "Yes"
+msgstr "Ja"
+
+#: src/fields/class-jvm_acf_jvm_rich_text_icons5.php:112
+msgid "No"
+msgstr "Nee"
+
+#: src/settings.php:57
+msgid "A custom icon set is being loaded from: %s. Keep your setting set to the default Font Awsome icon set to keep this working. The custom icon set can't be loaded if you are creating a SVG icon set from this page."
+msgstr "Er wordt een aangepaste icoonset geladen vanuit: %s. Houd je instelling op de standaard Font Awesome icoonset om dit werkend te houden. De aangepaste icoonset kan niet geladen worden als je een SVG-icoonset maakt vanaf deze pagina."
+
+#: src/settings.php:95
+#: src/init.php:169
+msgid "Delete Icon"
+msgstr "Icoon verwijderen"
+
+#: src/settings.php:96
+msgid ""
+"You are about to permanently delete this icon from your site. This action cannot be undone.\n"
+"'Cancel' to stop 'OK' to delete."
+msgstr ""
+"Je staat op het punt dit icoon permanent van je site te verwijderen. Dit kan niet ongedaan worden gemaakt.\n"
+"'Annuleren' om te stoppen, 'OK' om te verwijderen."
+
+#: src/settings.php:194
+msgid "JVM rich text icons"
+msgstr "JVM Rich Text Icons"
+
+#: src/settings.php:229
+msgid "Icon set"
+msgstr "Icoonset"
+
+#: src/settings.php:232
+msgid "Font Awesome 4.7"
+msgstr "Font Awesome 4.7"
+
+#: src/settings.php:233
+msgid "Font Awesome Free 5.15.4"
+msgstr "Font Awesome Free 5.15.4"
+
+#: src/settings.php:234
+msgid "Font Awesome Free 6.7.2"
+msgstr "Font Awesome Free 6.7.2"
+
+#: src/settings.php:266
+msgid "Render technology"
+msgstr "Rendertechnologie"
+
+#: src/settings.php:271
+msgid "Inline SVG"
+msgstr "Inline SVG"
+
+#: src/settings.php:274
+msgid "HTML + CSS"
+msgstr "HTML + CSS"
+
+#: src/settings.php:276
+msgid "HTML + CSS ::before pseudo-element"
+msgstr "HTML + CSS ::before pseudo-element"
+
+#: src/settings.php:279
+msgid "HTML + CSS ::after pseudo-element"
+msgstr "HTML + CSS ::after pseudo-element"
+
+#: src/init.php:95
+msgid "Donate to Support"
+msgstr "Doneer om te steunen"
+
+#: src/init.php:120
+msgid "Insert icon"
+msgstr "Icoon invoegen"
+
+#: src/init.php:316
+msgid "Enjoying %1$s? Please consider %2$sleaving a review%3$s — it helps other WordPress users find this plugin."
+msgstr "Tevreden over %1$s? Overweeg dan %2$seen review%3$s achter te laten — dat helpt andere WordPress-gebruikers deze plugin te vinden."

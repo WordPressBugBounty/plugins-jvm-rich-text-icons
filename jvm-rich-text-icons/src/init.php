@@ -383,7 +383,17 @@ class JVM_Richtext_icons {
                     foreach($data->glyphs as $g) {
                         $icons[] = $data->css_prefix_text.$g->css;
                     }
-                }else {
+                // Pro/extended format: object with icons array of {name, tags, categories, styles}
+                } elseif (is_object($data) && isset($data->icons) && is_array($data->icons)) {
+                    foreach ($data->icons as $icon) {
+                        if (is_object($icon) && isset($icon->name)) {
+                            $icons[] = $icon->name;
+                        } elseif (is_string($icon)) {
+                            $icons[] = $icon;
+                        }
+                    }
+                // Legacy format: flat array of class name strings
+                } else {
                     $icons = $data;
                 }
 
@@ -447,15 +457,38 @@ class JVM_Richtext_icons {
      */
     public static function parse_dynamic_css() {
         $settings = self::get_settings();
-        $view = 'dynamic_css.php';
+        $technology = isset($settings['technology']) ? $settings['technology'] : 'html-css';
+        $files = self::get_svg_file_list();
+        $prefix_class = self::get_class_prefix();
 
-        if ($settings['technology'] == 'html-css-before') {
-            $view = 'dynamic_css_before.php';
-        }else  if ($settings['technology'] == 'html-css-after') {
-            $view = 'dynamic_css_after.php';
+        $icons = [];
+        foreach ($files as $file) {
+            $pi = pathinfo($file);
+            $icon_class = sanitize_title($pi['filename']);
+            $file_content = file_get_contents($file);
+            if ($file_content === false) { continue; }
+
+            $ratio = 1;
+            $dom = new DOMDocument();
+            @$dom->load($file);
+            $svg = $dom->getElementsByTagName('svg');
+            if ($svg && $svg->length > 0) {
+                $viewBox = $svg[0]->getAttribute('viewBox');
+                if ($viewBox) {
+                    list($x, $y, $width, $height) = explode(' ', $viewBox);
+                } else {
+                    $width = str_replace('px', '', $svg[0]->getAttribute('width'));
+                    $height = str_replace('px', '', $svg[0]->getAttribute('height'));
+                }
+                if (!empty($width) && !empty($height)) {
+                    $ratio = $width / $height;
+                }
+            }
+
+            $icons[] = ['class' => $icon_class, 'svg' => $file_content, 'ratio' => $ratio];
         }
 
-        return JVM_Richtext_icons::render_view($view, ['files' => JVM_Richtext_icons::get_svg_file_list(), 'settings', JVM_Richtext_icons::get_settings()]);
+        return JVM_RTI_Renderer::generate_css($icons, $technology);
     }
 
     /**

@@ -3,8 +3,7 @@ Contributors: jorisvanmontfort
 Donate link: https://www.paypal.com/donate/?hosted_button_id=VXZJG9GC34JJU
 Tags: icon, svg, font-awesome, gutenberg, icon-block
 Requires at least: 5.4
-Tested up to: 6.9
-Stable tag: 1.5.1
+Tested up to: 6.9 * Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Playground: true
@@ -82,6 +81,16 @@ add_filter( 'jvm_richtext_icons_show_settings', '__return_false');
 Please note that if you are loading a custom icon set with the plugin hooks, you should keep the plugin settings set to "Font Awesome 4.7" (default).
 
 == Changelog ==
+
+= 1.6.0 =
+* Renamed the "Custom SVG icon set" to "My SVG uploads" for clarity.
+* Improved layout forSVG uploads grid on the settings page: CSS grid layout with icon class name labels.
+* Added Dutch and German translations.
+* Added `load_plugin_textdomain()` for translation support.
+* Fixed Text Domain header mismatch (was `jvm-richtext-icons`, now matches code: `jvm-rich-text-icons`).
+* Centralized CSS renderer for custom SVG icons. Replaces three separate view files with a single renderer class that supports all render technologies (inline-svg, html-css, html-css-before, html-css-after).
+* Icons JSON parser supports a new pro/extended format alongside the existing flat array and Fontello formats.
+* More preparation for (Pro) future features.
 
 = 1.5.1 =
 * Added extensibility hooks for pro plugin support: `jvm_richtext_icons_svg_directories`, `jvm_richtext_icons_use_inline_svg`, `jvm_richtext_icons_available_icon_sets`, `jvm_richtext_icons_valid_icon_sets`, `jvm_richtext_icons_load_default_css`.
