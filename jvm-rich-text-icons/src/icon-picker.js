@@ -2,7 +2,12 @@ import { __ } from "@wordpress/i18n";
 import { useState, useMemo } from "@wordpress/element";
 import { Button, TextControl, Tooltip } from "@wordpress/components";
 
-export default function IconPicker({ icons, classPrefix, selectedIcon, onSelect }) {
+export default function IconPicker({
+  icons,
+  classPrefix,
+  selectedIcon,
+  onSelect,
+}) {
   const [keyword, setKeyword] = useState("");
 
   const filteredIcons = useMemo(() => {
@@ -14,6 +19,8 @@ export default function IconPicker({ icons, classPrefix, selectedIcon, onSelect 
   return (
     <div className="jvm-richtext-icons-picker">
       <TextControl
+        __next40pxDefaultSize
+        __nextHasNoMarginBottom
         value={keyword}
         placeholder={__("Search", "jvm-richtext-icons")}
         onChange={setKeyword}
@@ -29,7 +36,10 @@ export default function IconPicker({ icons, classPrefix, selectedIcon, onSelect 
                     className={icon === selectedIcon ? "is-selected" : ""}
                     onClick={() => onSelect(icon)}
                   >
-                    <i className={classPrefix + " " + icon} aria-hidden="true"></i>
+                    <i
+                      className={classPrefix + " " + icon}
+                      aria-hidden="true"
+                    ></i>
                   </Button>
                 </Tooltip>
               </li>

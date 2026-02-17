@@ -2,7 +2,7 @@
 /**
  * Plugin Name: JVM Rich Text Icons
  * Description: Insert icons anywhere in your content. Inline in text, as a block, or in ACF fields. Includes Font Awesome and supports custom SVG icons.
- * Version: 1.6.0
+ * Version: 1.6.1
  * Author: Joris van Montfort
  * Author URI: https://jorisvm.nl
  * Text Domain: jvm-rich-text-icons
@@ -10,7 +10,7 @@
  *
  * @category Gutenberg
  * @author Joris van Montfort
- * @version 1.6.0
+ * @version 1.6.1
  * @package JVM Rich Text Icons
  */
 

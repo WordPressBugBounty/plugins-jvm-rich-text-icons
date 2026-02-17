@@ -8,6 +8,7 @@ import domReady from "@wordpress/dom-ready";
 
 import IconMap from "./controls";
 import IconPicker from "./icon-picker";
+import metadata from "./block.json";
 
 /**
  * Block constants
@@ -43,32 +44,8 @@ domReady(function () {
   });
 });
 
-registerBlockType("jvm/single-icon", {
-  title: __("Single icon"),
-  icon: "flag",
-  category: "common",
-  keywords: [__("Icon")],
-
-  supports: {
-    color: {
-      text: true,
-      background: true,
-    },
-    spacing: {
-      margin: true,
-      padding: true,
-    },
-  },
-
-  attributes: {
-    icon: {
-      type: "string",
-    },
-
-    fontSize: {
-      type: "number",
-    },
-  },
+registerBlockType(metadata.name, {
+  ...metadata,
 
   edit: (props) => {
     let icons = jvm_richtext_icon_settings.iconset;
@@ -109,6 +86,8 @@ registerBlockType("jvm/single-icon", {
               onSelect={(iconName) => props.setAttributes({ icon: iconName })}
             />
             <RangeControl
+              __next40pxDefaultSize
+              __nextHasNoMarginBottom
               label={__("Font Size (px)")}
               value={currentFontSize}
               min={10}

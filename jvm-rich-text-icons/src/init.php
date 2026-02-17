@@ -25,6 +25,7 @@ class JVM_Richtext_icons {
     private function __construct() {
         add_filter( 'block_editor_settings_all', array( $this, 'block_editor_settings' ), 10, 2 );
         add_action( 'init', array( $this, 'load_css') );
+        add_action( 'enqueue_block_assets', array( $this, 'load_css') );
         add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_assets') );
         add_filter( 'plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2 );
         add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
@@ -34,41 +35,15 @@ class JVM_Richtext_icons {
 
 
         /**
-         * Register Gutenberg block on server-side.
+         * Register Gutenberg block on server-side from block.json.
          *
-         * Register the block on server-side to ensure that the block
-         * scripts and styles for both frontend and backend are
-         * enqueued when the editor loads.
-         *
-         * @link https://wordpress.org/gutenberg/handbook/blocks/writing-your-first-block-type#enqueuing-block-scripts
+         * @link https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/
          * @since 1.16.0
          */
-        register_block_type(
-            'jvm/single-icon', array(
-                // Enqueue blocks.style.build.css on both frontend & backend.
-                //'style'         => 'jvm_details_summary-cgb-style-css',
-                // Enqueue blocks.build.js in the editor only.
-                'editor_script' => 'jvm-rich-text-icons-js',
-                // Enqueue blocks.editor.build.css in the editor only.
-                'editor_style'  => 'jvm-rich-text-icons-editor-css',
-                'supports' => [
-                    'align' => true,
-                    'color' => [
-                      'text' => true,
-                      'background' => true,
-                      'link' => false
-                    ],
-                    'spacing' => [
-                        'padding' => true,
-                        'margin' => true,
-                        '__experimentalDefaultControls' => [
-                            'margin' => false,
-                            'padding' =>  false
-                        ]
-                    ]
-                ]
-            )
-        );
+        register_block_type( plugin_dir_path( __DIR__ ) . 'src', array(
+            'editor_script' => 'jvm-rich-text-icons-js',
+            'editor_style'  => 'jvm-rich-text-icons-editor-css',
+        ) );
     }
 
     /**

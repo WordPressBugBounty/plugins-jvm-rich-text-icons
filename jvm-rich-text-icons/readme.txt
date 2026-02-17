@@ -1,9 +1,10 @@
-=== JVM Gutenberg Rich Text Icons ===
+=== JVM Rich Text Icons ===
 Contributors: jorisvanmontfort
 Donate link: https://www.paypal.com/donate/?hosted_button_id=VXZJG9GC34JJU
 Tags: icon, svg, font-awesome, gutenberg, icon-block
 Requires at least: 5.4
-Tested up to: 6.9 * Stable tag: 1.6.0
+Tested up to: 6.9.1
+Stable tag: 1.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Playground: true
@@ -21,6 +22,8 @@ Add icons to any rich text field in the WordPress block editor. Insert icons inl
 * **Custom SVG icon set** - Upload your own SVG icons via a drag & drop uploader in the plugin settings. This is the recommended approach for the best performance.
 * **Single icon block** - A dedicated block with font size, color, alignment and spacing options.
 * **ACF integration** - Adds a "JVM Icon" field type for Advanced Custom Fields.
+
+[See it in action](https://nl.wordpress.org/plugins/jvm-rich-text-icons/?preview=1)
 
 = How it works =
 
@@ -40,7 +43,7 @@ Alternative render technologies (CSS masks, ::before / ::after pseudo-elements) 
 
 = For developers =
 
-The plugin provides several filter hooks to customize its behavior. You can load your own icon set, CSS file, or change the icon class prefix. The icon config file can also be in Fontello format (see <https://fontello.com>).
+The plugin provides several filter hooks to customize its behavior. You can load your own icon set, CSS file, or change the icon class prefix.
 
 **Load a custom icon set file**
 
@@ -82,9 +85,16 @@ Please note that if you are loading a custom icon set with the plugin hooks, you
 
 == Changelog ==
 
+= 1.6.1 =
+* Migrated the single icon block to use `block.json` for block metadata registration.
+* Added text alignment support to the single icon block. It had been added before but was broken.
+* Added border controls (color, style, width, radius) to the single icon block.
+* Fixed editor iframe style loading for icon font CSS by adding `enqueue_block_assets` hook.
+* Fixed deprecation warnings for `TextControl` and `RangeControl` components.
+
 = 1.6.0 =
 * Renamed the "Custom SVG icon set" to "My SVG uploads" for clarity.
-* Improved layout forSVG uploads grid on the settings page: CSS grid layout with icon class name labels.
+* Improved layout for SVG uploads grid on the settings page: CSS grid layout with icon class name labels.
 * Added Dutch and German translations.
 * Added `load_plugin_textdomain()` for translation support.
 * Fixed Text Domain header mismatch (was `jvm-richtext-icons`, now matches code: `jvm-rich-text-icons`).
