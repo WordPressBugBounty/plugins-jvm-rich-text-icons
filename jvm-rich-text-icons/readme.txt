@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=VXZJG9GC34JJU
 Tags: icon, svg, font-awesome, gutenberg, icon-block
 Requires at least: 5.4
 Tested up to: 6.9.1
-Stable tag: 1.6.1
+Stable tag: 1.6.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Playground: true
@@ -81,9 +81,15 @@ add_filter( 'jvm_richtext_icons_base_class', function() {
 add_filter( 'jvm_richtext_icons_show_settings', '__return_false');
 `
 
-Please note that if you are loading a custom icon set with the plugin hooks, you should keep the plugin settings set to "Font Awesome 4.7" (default).
+Please note that if you are loading a custom icon set with the plugin hook: `jvm_richtext_icons_css_file`, you should make sure the plugin is not set to My SVG uploads as this setting does not load any CSS file.
 
 == Changelog ==
+
+= 1.6.2 =
+* Enhanced the settings page to use inline SVG icons for the preview of My SVG uploads. This prevents the need for additional (large) CSS when using a lot of icons.
+* Font Awesome 6 is now the default icon set on a fresh install.
+* Bug fix: The plugin would add doubled CSS markup for My SVG uploads.
+* Bug fix: Added line-height: 1 to the single icon block to ensure it is always vertically centered.
 
 = 1.6.1 =
 * Migrated the single icon block to use `block.json` for block metadata registration.

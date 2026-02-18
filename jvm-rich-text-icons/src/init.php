@@ -25,7 +25,7 @@ class JVM_Richtext_icons {
     private function __construct() {
         add_filter( 'block_editor_settings_all', array( $this, 'block_editor_settings' ), 10, 2 );
         add_action( 'init', array( $this, 'load_css') );
-        add_action( 'enqueue_block_assets', array( $this, 'load_css') );
+        add_action( 'enqueue_block_assets', array( $this, 'load_editor_icon_css') );
         add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_assets') );
         add_filter( 'plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2 );
         add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
@@ -149,10 +149,32 @@ class JVM_Richtext_icons {
     }
 
     /**
+     * Enqueue icon CSS in the block editor iframe.
+     * Only runs in admin context to avoid double-loading on the frontend.
+     */
+    public function load_editor_icon_css() {
+        if ( is_admin() ) {
+            self::load_css();
+        }
+    }
+
+    /**
      * Enqueue Gutenberg block assets for both frontend + backend.
      */
     public static function load_css() {
         $settings = self::get_settings();
+        $technology = isset($settings['technology']) ? $settings['technology'] : 'html-css';
+
+        // Base CSS — always loaded regardless of pro override or technology
+        if (!is_admin()) {
+            wp_register_style('jvm-rich-text-icons-svg', false);
+            wp_enqueue_style('jvm-rich-text-icons-svg');
+            $base_css = '.wp-block-jvm-single-icon{line-height:1}';
+            if ($technology === 'inline-svg') {
+                $base_css = 'svg.icon{width:1em;height:1em;display:inline-block;vertical-align:-0.125em;fill:currentColor}' . $base_css;
+            }
+            wp_add_inline_style('jvm-rich-text-icons-svg', $base_css);
+        }
 
         $load_default_css = apply_filters('jvm_richtext_icons_load_default_css', true, $settings);
         if (!$load_default_css) {
@@ -166,12 +188,9 @@ class JVM_Richtext_icons {
         }
 
         if ($icon_set == 'custom-svg') {
-            wp_register_style('jvm-rich-text-icons-svg', false);
-            wp_enqueue_style( 'jvm-rich-text-icons-svg' );
-
-            if ($settings['technology'] == 'inline-svg' && !is_admin()) {
-                wp_add_inline_style('jvm-rich-text-icons-svg', 'svg.icon{width:1em;height:1em;display:inline-block;vertical-align:-0.125em;fill:currentColor}');
-            } else {
+            if ($technology !== 'inline-svg' || is_admin()) {
+                wp_register_style('jvm-rich-text-icons-svg', false);
+                wp_enqueue_style('jvm-rich-text-icons-svg');
                 // In admin/editor always load mask-based CSS so <i> tags render correctly
                 wp_add_inline_style('jvm-rich-text-icons-svg', JVM_Richtext_icons::parse_dynamic_css());
             }
@@ -392,7 +411,7 @@ class JVM_Richtext_icons {
         }
 
         if (!isset($settings['icon_set'])) {
-            $settings['icon_set'] = 'default';
+            $settings['icon_set'] = 'fa-6';
         }
 
         if (!isset($settings['technology'])) {

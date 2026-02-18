@@ -164,7 +164,8 @@
   background-color: #f0f6fc;
 }
 
-#svg-file-list .icon-dialog-link i {
+#svg-file-list .icon-dialog-link i,
+#svg-file-list .icon-dialog-link .icon-dialog-svg {
   font-size: 24px;
   width: 24px;
   height: 24px;
@@ -173,6 +174,18 @@
   justify-content: center;
   margin: 0 !important;
   top: 0 !important;
+}
+
+#svg-file-list .icon-dialog-svg svg {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
+
+#icon-dialog-preview svg {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
 }
 
 #svg-file-list .icon-dialog-label {

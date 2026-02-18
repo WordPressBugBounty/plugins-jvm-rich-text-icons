@@ -46,7 +46,6 @@ class JVM_RTI_Renderer
 
         $p = JVM_Richtext_icons::get_class_prefix();
         $css = ".wp-block {\n    /* Fixes the iframe site editor */\n}\n";
-
         if ($technology === "html-css-before" || $technology === "html-css-after") {
             $pseudo = ($technology === "html-css-before") ? "before" : "after";
 

@@ -145,12 +145,17 @@ class JVM_Richtext_icons_settings {
                     $pi = pathinfo($new_file_name);
                     $css_class = JVM_Richtext_icons::get_class_prefix();
                     $icon_class = sanitize_title($pi['filename']);
+                    $svg_content = file_get_contents($base.$new_file_name);
+                    if (class_exists('JVM_RTI_Renderer')) {
+                        $svg_content = JVM_RTI_Renderer::clean_svg($svg_content);
+                    }
                     wp_send_json([
                         "success" => true,
                         "icon_class_full" => $css_class.' '.$icon_class,
                         "icon_class" => $icon_class,
                         "file" => $new_file_name,
                         "nonce" => wp_create_nonce('jvm-rich-text-icons-delete-icon'),
+                        "svg" => $svg_content,
                         'css_code' => JVM_Richtext_icons::parse_dynamic_css()
                     ]);
                     exit();
