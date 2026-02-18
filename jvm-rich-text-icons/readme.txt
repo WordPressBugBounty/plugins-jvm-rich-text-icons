@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=VXZJG9GC34JJU
 Tags: icon, svg, font-awesome, gutenberg, icon-block
 Requires at least: 5.4
 Tested up to: 6.9.1
-Stable tag: 1.6.2
+Stable tag: 1.6.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Playground: true
@@ -84,6 +84,9 @@ add_filter( 'jvm_richtext_icons_show_settings', '__return_false');
 Please note that if you are loading a custom icon set with the plugin hook: `jvm_richtext_icons_css_file`, you should make sure the plugin is not set to My SVG uploads as this setting does not load any CSS file.
 
 == Changelog ==
+
+= 1.6.3 =
+* Bug fix: for some uploaded SVG icons the colors would display incorrectly on the settings page.
 
 = 1.6.2 =
 * Enhanced the settings page to use inline SVG icons for the preview of My SVG uploads. This prevents the need for additional (large) CSS when using a lot of icons.
