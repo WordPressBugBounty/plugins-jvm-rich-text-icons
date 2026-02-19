@@ -42,6 +42,15 @@
     },
     "fontSize": {
       "type": "number"
+    },
+    "url": {
+      "type": "string"
+    },
+    "linkTarget": {
+      "type": "string"
+    },
+    "rel": {
+      "type": "string"
     }
   }
 }
