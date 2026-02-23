@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=VXZJG9GC34JJU
 Tags: icon, svg, font-awesome, gutenberg, icon-block
 Requires at least: 5.4
 Tested up to: 6.9.1
-Stable tag: 1.6.4
+Stable tag: 1.6.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Playground: true
@@ -84,6 +84,11 @@ add_filter( 'jvm_richtext_icons_show_settings', '__return_false');
 Please note that if you are loading a custom icon set with the plugin hook: `jvm_richtext_icons_css_file`, you should make sure the plugin is not set to My SVG uploads as this setting does not load any CSS file.
 
 == Changelog ==
+
+= 1.6.5 =
+* Added SVG security sanitizer: uploaded SVG files are now scanned for XSS vectors (scripts, event handlers, external references, forbidden tags) before being stored. The sanitizer runs automatically on every upload. When JVM Rich Text Icons Pro is active, the pro sanitizer (which also normalizes colors and viewBox) runs instead.
+* Added filter hook `jvm_richtext_icons_process_uploaded_svg` that fires after an SVG is uploaded. Third-party plugins (such as JVM Rich Text Icons Pro) can use this hook to sanitize or transform the SVG content before it is stored. The filter receives the current result (`null` by default), the raw SVG content, and the absolute file path. Return a clean SVG string to replace the file, or a `WP_Error` to reject the upload and remove the file.
+* Updated the "Remove link" icon in the single icon block toolbar.
 
 = 1.6.4 =
 * Added link support to the single icon block. Click the link button in the block toolbar to add a URL with an optional "Open in new tab" toggle.

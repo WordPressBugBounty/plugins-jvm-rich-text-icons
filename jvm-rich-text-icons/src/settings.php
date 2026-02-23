@@ -13,6 +13,7 @@ class JVM_Richtext_icons_settings {
      */
     public function __construct() {
         add_action('after_setup_theme', array($this, 'try_add_settings'));
+        add_filter('jvm_richtext_icons_process_uploaded_svg', [$this, 'sanitize_uploaded_svg'], 10, 3);
     }
 
     /**
@@ -146,9 +147,28 @@ class JVM_Richtext_icons_settings {
                     $css_class = JVM_Richtext_icons::get_class_prefix();
                     $icon_class = sanitize_title($pi['filename']);
                     $svg_content = file_get_contents($base.$new_file_name);
-                    if (class_exists('JVM_RTI_Renderer')) {
-                        $svg_content = JVM_RTI_Renderer::clean_svg($svg_content);
+
+                    /**
+                     * Allow plugins (e.g. the pro plugin) to sanitize the uploaded SVG.
+                     *
+                     * @param null|string|\WP_Error $result      Return null to skip, a clean SVG string to replace
+                     *                                           the file contents, or a WP_Error to reject the upload.
+                     * @param string                $svg_content Raw SVG content as read from disk.
+                     * @param string                $file_path   Absolute path to the uploaded file.
+                     */
+                    $sanitize_result = apply_filters( 'jvm_richtext_icons_process_uploaded_svg', null, $svg_content, $base . $new_file_name );
+
+                    if ( is_wp_error( $sanitize_result ) ) {
+                        @unlink( $base . $new_file_name );
+                        wp_send_json( [ "success" => false, "message" => $sanitize_result->get_error_message() ] );
+                        exit();
                     }
+
+                    if ( is_string( $sanitize_result ) && $sanitize_result !== '' ) {
+                        file_put_contents( $base . $new_file_name, $sanitize_result );
+                        $svg_content = $sanitize_result;
+                    }
+
                     wp_send_json([
                         "success" => true,
                         "icon_class_full" => $css_class.' '.$icon_class,
@@ -165,6 +185,30 @@ class JVM_Richtext_icons_settings {
 
         wp_send_json(["success" => false]);
         exit();
+    }
+
+    /**
+     * Sanitize an uploaded SVG using the base security sanitizer.
+     *
+     * Hooked on 'jvm_richtext_icons_process_uploaded_svg' at priority 10.
+     * Skips if a previous handler (e.g. the pro plugin at priority 5) already
+     * returned a result.
+     *
+     * @param  null|string|\WP_Error $result      Previous filter value.
+     * @param  string                $svg_content Raw SVG content.
+     * @param  string                $file_path   Absolute path to the uploaded file.
+     * @return string|\WP_Error  Clean SVG string, or WP_Error on failure.
+     */
+    public function sanitize_uploaded_svg($result, string $svg_content, string $file_path)
+    {
+        if ($result !== null) {
+            return $result; // Already handled (e.g. by pro plugin at priority 5).
+        }
+
+        $sanitizer = new JVM_RTI_SVG_Sanitizer();
+        $r = $sanitizer->process($svg_content);
+
+        return $r->has_error() ? $r->get_error() : $r->svg;
     }
 
     /**
