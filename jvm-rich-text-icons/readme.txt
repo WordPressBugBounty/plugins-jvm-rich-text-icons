@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=VXZJG9GC34JJU
 Tags: icon, svg, font-awesome, gutenberg, icon-block
 Requires at least: 5.4
 Tested up to: 6.9.1
-Stable tag: 1.6.5
+Stable tag: 1.6.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Playground: true
@@ -84,6 +84,9 @@ add_filter( 'jvm_richtext_icons_show_settings', '__return_false');
 Please note that if you are loading a custom icon set with the plugin hook: `jvm_richtext_icons_css_file`, you should make sure the plugin is not set to My SVG uploads as this setting does not load any CSS file.
 
 == Changelog ==
+
+= 1.6.6 =
+Bug fix: font color for inline SVG icons broke in version 1.6.5.
 
 = 1.6.5 =
 * Added SVG security sanitizer: uploaded SVG files are now scanned for XSS vectors (scripts, event handlers, external references, forbidden tags) before being stored. The sanitizer runs automatically on every upload. When JVM Rich Text Icons Pro is active, the pro sanitizer (which also normalizes colors and viewBox) runs instead.

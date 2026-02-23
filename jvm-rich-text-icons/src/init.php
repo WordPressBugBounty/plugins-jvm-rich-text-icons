@@ -171,7 +171,7 @@ class JVM_Richtext_icons {
             wp_enqueue_style('jvm-rich-text-icons-svg');
             $base_css = '.wp-block-jvm-single-icon{line-height:1}';
             if ($technology === 'inline-svg') {
-                $base_css = 'svg.icon{width:1em;height:1em;display:inline-block;vertical-align:-0.125em}' . $base_css;
+                $base_css = 'svg.icon{width:1em;height:1em;display:inline-block;vertical-align:-0.125em;fill: currentColor}' . $base_css;
             }
             wp_add_inline_style('jvm-rich-text-icons-svg', $base_css);
         }
