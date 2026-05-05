@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/donate/?hosted_button_id=VXZJG9GC34JJU
 Tags: icon, svg, font-awesome, gutenberg, icon-block
 Requires at least: 5.4
 Tested up to: 6.9.1
-Stable tag: 1.6.6
+Stable tag: 1.6.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Playground: true
@@ -84,6 +84,10 @@ add_filter( 'jvm_richtext_icons_show_settings', '__return_false');
 Please note that if you are loading a custom icon set with the plugin hook: `jvm_richtext_icons_css_file`, you should make sure the plugin is not set to My SVG uploads as this setting does not load any CSS file.
 
 == Changelog ==
+
+= 1.6.7 =
+* Performance improvement for large custom SVG icon sets: CSS generation is now cached using a WordPress transient, so file reads and base64 encoding only happen once rather than on every page load. The cache invalidates automatically when icons are added or removed.
+* Bug fix: custom SVG CSS was being generated twice per admin page load (via two separate WordPress hooks), causing the full icon stylesheet to appear twice in the editor HTML. This has been fixed so the CSS is generated and output once per request.
 
 = 1.6.6 =
 Bug fix: font color for inline SVG icons broke in version 1.6.5.
