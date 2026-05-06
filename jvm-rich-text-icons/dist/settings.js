@@ -18,7 +18,7 @@
   var $uploadIndex = $("#upload-index");
   var $uploadTotal = $("#upload-total");
   var $uploadFilename = $("#upload-filename");
-  var iconDropZone = new Dropzone("#jvm-rich-text-icons_custom_icon_uploader", {
+  var iconDropZone = $('#jvm-rich-text-icons_custom_icon_uploader').length ? new Dropzone("#jvm-rich-text-icons_custom_icon_uploader", {
     paramName: "file", // The name that will be used to transfer the file
     maxFilesize: 2, // MB
     acceptedFiles: ".svg",
@@ -92,7 +92,7 @@
         $("#jvm-rich-text-icons-svg-inline-css").html(res.css_code);
       }
     },
-  });
+  }) : null;
 
   // Clear upload errors
   $dismissErrors.on("click", function (e) {
@@ -188,4 +188,62 @@
 
     $info.dialog("open");
   });
+  // ---- Bulk Sanitize (Tools tab) ----
+
+  var $bulkBtn    = $('#jvm-rti-bulk-sanitize-btn');
+  var $bulkProgress = $('#jvm-rti-bulk-progress');
+  var $bulkBar    = $('#jvm-rti-bulk-bar-inner');
+  var $bulkStatus = $('#jvm-rti-bulk-status');
+  var $bulkErrors = $('#jvm-rti-bulk-errors');
+
+  $bulkBtn.on('click', function () {
+    $bulkBtn.prop('disabled', true);
+    $bulkErrors.hide().html('');
+    $bulkProgress.show();
+    $bulkBar.css('width', '0%');
+    $bulkStatus.text(jvm_richtext_icon_settings.text.bulk_sanitize_running);
+    runBatch(0, []);
+  });
+
+  function runBatch(offset, allErrors) {
+    $.post(
+      jvm_richtext_icon_settings.ajax_url,
+      {
+        action: 'jvm-rich-text-icons-bulk-sanitize',
+        nonce:  jvm_richtext_icon_settings.bulk_sanitize_nonce,
+        offset: offset,
+      },
+      function (r) {
+        if (!r.success) {
+          $bulkStatus.text('Error: ' + (r.message || 'Unknown error'));
+          $bulkBtn.prop('disabled', false);
+          return;
+        }
+
+        var pct = r.total > 0 ? Math.round((r.processed / r.total) * 100) : 100;
+        $bulkBar.css('width', pct + '%');
+        $bulkStatus.text(r.processed + ' / ' + r.total);
+
+        allErrors = allErrors.concat(r.errors || []);
+
+        if (r.done) {
+          $bulkBtn.prop('disabled', false);
+          if (allErrors.length > 0) {
+            var html = '<p><strong>' + jvm_richtext_icon_settings.text.bulk_sanitize_errors + '</strong></p><ul>';
+            allErrors.forEach(function (e) {
+              html += '<li>' + $('<span>').text(e).html() + '</li>';
+            });
+            html += '</ul>';
+            $bulkErrors.html(html).show();
+          }
+          var doneMsg = jvm_richtext_icon_settings.text.bulk_sanitize_done.replace('%d', r.total);
+          $bulkStatus.text(doneMsg);
+        } else {
+          runBatch(r.processed, allErrors);
+        }
+      },
+      'json'
+    );
+  }
+
 })(jQuery);

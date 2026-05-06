@@ -200,3 +200,66 @@
   -webkit-box-orient: vertical;
   margin-top: 4px;
 }
+
+/* ---- Tools tab fieldset ---- */
+
+.jvm-rti-fieldset {
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  padding: 4px 16px 16px;
+  margin: 16px 0 24px;
+}
+
+.jvm-rti-fieldset legend {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0 6px;
+  color: #1d2327;
+}
+
+.jvm-rti-fieldset > p {
+  color: #50575e;
+  margin: 8px 0 0;
+}
+
+/* ---- Bulk sanitize (Tools tab) ---- */
+
+#jvm-rti-bulk-sanitize-section {
+  margin-top: 24px;
+}
+
+.jvm-rti-bulk-bar-wrap {
+  position: relative;
+  height: 10px;
+  background: #dcdcde;
+  border-radius: 5px;
+  width: 100%;
+  margin: 8px 0 4px;
+}
+
+#jvm-rti-bulk-bar-inner {
+  height: 10px;
+  background: #2271b1;
+  border-radius: 5px;
+  transition: width 0.2s ease;
+  min-width: 0;
+  width: 0;
+}
+
+#jvm-rti-bulk-status {
+  color: #50575e;
+  margin: 4px 0 12px;
+}
+
+#jvm-rti-bulk-errors {
+  border-left: 4px solid #d63638;
+  background: #fff;
+  padding: 8px 12px;
+  margin: 8px 0 12px;
+  max-width: 600px;
+}
+
+#jvm-rti-bulk-errors ul {
+  margin: 4px 0 0 16px;
+  list-style: disc;
+}

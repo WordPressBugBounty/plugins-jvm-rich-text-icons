@@ -3,8 +3,8 @@ Contributors: jorisvanmontfort
 Donate link: https://www.paypal.com/donate/?hosted_button_id=VXZJG9GC34JJU
 Tags: icon, svg, font-awesome, gutenberg, icon-block
 Requires at least: 5.4
-Tested up to: 6.9.1
-Stable tag: 1.6.7
+Tested up to: 6.9.4
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Playground: true
@@ -84,6 +84,13 @@ add_filter( 'jvm_richtext_icons_show_settings', '__return_false');
 Please note that if you are loading a custom icon set with the plugin hook: `jvm_richtext_icons_css_file`, you should make sure the plugin is not set to My SVG uploads as this setting does not load any CSS file.
 
 == Changelog ==
+
+= 1.7.0 =
+* Settings page split into two tabs: **Icon Set** (existing settings) and **Tools & Settings** (new).
+* Replaced the security-only SVG sanitizer with a full-featured sanitizer that supports configurable normalization. All options are exposed as checkboxes on the Tools & Settings tab and apply to every new SVG upload.
+* New sanitizer options: normalize fill/stroke colors to `currentColor`, derive and normalize `viewBox`, square non-square `viewBox`, remove `id` attributes to prevent DOM collisions, auto-convert white-shape cutout patterns to proper SVG `<mask>` elements.
+* Added a Bulk Sanitize tool on the Tools & Settings tab. Re-processes all uploaded SVG icons through the current sanitizer settings in place, with a live progress bar.
+* Updated Dutch (nl_NL) and German (de_DE) translations with all new strings.
 
 = 1.6.7 =
 * Performance improvement for large custom SVG icon sets: CSS generation is now cached using a WordPress transient, so file reads and base64 encoding only happen once rather than on every page load. The cache invalidates automatically when icons are added or removed.

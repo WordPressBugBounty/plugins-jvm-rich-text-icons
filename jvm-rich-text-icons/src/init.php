@@ -417,6 +417,19 @@ class JVM_Richtext_icons
             $settings["technology"] = "inline-svg";
         }
 
+        $sanitizer_defaults = [
+            'sanitizer_normalize_colors'    => true,
+            'sanitizer_normalize_viewbox'   => true,
+            'sanitizer_square_viewbox'      => false,
+            'sanitizer_remove_ids'          => true,
+            'sanitizer_convert_white_masks' => true,
+        ];
+        foreach ($sanitizer_defaults as $key => $default) {
+            if (!isset($settings[$key])) {
+                $settings[$key] = $default;
+            }
+        }
+
         return $settings;
     }
 

@@ -29,12 +29,14 @@ class JVM_Richtext_icons_settings {
                 add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
                 add_action( 'admin_init', array( $this, 'page_init' ) );
                 add_action( 'admin_init', array( $this, 'register_technology_field' ), 30 );
+                add_action( 'admin_init', array( $this, 'register_sanitizer_fields' ), 40 );
                 add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ));
 
                 // Ajax calls
                 if (current_user_can( 'upload_files' )) {
                     add_action('wp_ajax_jvm-rich-text-icons-delete-icon', array( $this, 'ajax_delete_icon'));
                     add_action('wp_ajax_jvm-rich-text-icons-upload-icon', array( $this, 'ajax_upload_icon'));
+                    add_action('wp_ajax_jvm-rich-text-icons-bulk-sanitize', array( $this, 'ajax_bulk_sanitize'));
                 }
 
                 // Notice on settings screen if a custom icon set is loaded
@@ -90,11 +92,15 @@ class JVM_Richtext_icons_settings {
                 'jvm-rich-text-icons-settings-js',
                 'jvm_richtext_icon_settings', // Array containing dynamic data for a JS Global.
                 [
-                    'ajax_url' => admin_url( 'admin-ajax.php' ),
-                    'max_upload_size' => wp_max_upload_size(),
+                    'ajax_url'            => admin_url( 'admin-ajax.php' ),
+                    'max_upload_size'     => wp_max_upload_size(),
+                    'bulk_sanitize_nonce' => wp_create_nonce( 'jvm-rich-text-icons-bulk-sanitize' ),
                     'text' => [
-                        'delete_icon' => __('Delete Icon', 'jvm-rich-text-icons'),
-                        'delete_icon_confirm' => __("You are about to permanently delete this icon from your site. This action cannot be undone.\n'Cancel' to stop 'OK' to delete.", 'jvm-rich-text-icons'),
+                        'delete_icon'          => __('Delete Icon', 'jvm-rich-text-icons'),
+                        'delete_icon_confirm'  => __("You are about to permanently delete this icon from your site. This action cannot be undone.\n'Cancel' to stop 'OK' to delete.", 'jvm-rich-text-icons'),
+                        'bulk_sanitize_running'=> __('Sanitizing...', 'jvm-rich-text-icons'),
+                        'bulk_sanitize_done'   => __('Done! %d icons processed.', 'jvm-rich-text-icons'),
+                        'bulk_sanitize_errors' => __('Some icons could not be processed:', 'jvm-rich-text-icons'),
                     ]
                 ]
             );
@@ -205,10 +211,91 @@ class JVM_Richtext_icons_settings {
             return $result; // Already handled (e.g. by pro plugin at priority 5).
         }
 
-        $sanitizer = new JVM_RTI_SVG_Sanitizer();
+        $settings  = JVM_Richtext_icons::get_settings();
+        $sanitizer = new JVM_RTI_SVG_Sanitizer([
+            'normalize_colors'    => (bool) $settings['sanitizer_normalize_colors'],
+            'normalize_viewbox'   => (bool) $settings['sanitizer_normalize_viewbox'],
+            'square_viewbox'      => (bool) $settings['sanitizer_square_viewbox'],
+            'remove_ids'          => (bool) $settings['sanitizer_remove_ids'],
+            'convert_white_masks' => (bool) $settings['sanitizer_convert_white_masks'],
+        ]);
         $r = $sanitizer->process($svg_content);
 
         return $r->has_error() ? $r->get_error() : $r->svg;
+    }
+
+    /**
+     * Bulk sanitize uploaded SVG icons using current sanitizer settings.
+     * Processes files in batches of 20 to avoid PHP timeouts.
+     */
+    public function ajax_bulk_sanitize()
+    {
+        if (!current_user_can('upload_files')) {
+            wp_send_json(['success' => false, 'message' => __('Permission denied.', 'jvm-rich-text-icons')]);
+        }
+
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'jvm-rich-text-icons-bulk-sanitize')) {
+            wp_send_json(['success' => false, 'message' => __('Invalid nonce.', 'jvm-rich-text-icons')]);
+        }
+
+        $svg_dir = JVM_Richtext_icons::get_svg_directory();
+        if (!is_writable($svg_dir)) {
+            wp_send_json([
+                'success' => false,
+                'message' => sprintf(
+                    __('The SVG uploads directory is not writable: %s', 'jvm-rich-text-icons'),
+                    $svg_dir
+                ),
+            ]);
+        }
+
+        $offset     = isset($_POST['offset']) ? absint($_POST['offset']) : 0;
+        $batch_size = 20;
+        $files      = JVM_Richtext_icons::get_svg_file_list();
+        $total      = count($files);
+        $batch      = array_slice($files, $offset, $batch_size);
+
+        $settings  = JVM_Richtext_icons::get_settings();
+        $sanitizer = new JVM_RTI_SVG_Sanitizer([
+            'normalize_colors'    => (bool) $settings['sanitizer_normalize_colors'],
+            'normalize_viewbox'   => (bool) $settings['sanitizer_normalize_viewbox'],
+            'square_viewbox'      => (bool) $settings['sanitizer_square_viewbox'],
+            'remove_ids'          => (bool) $settings['sanitizer_remove_ids'],
+            'convert_white_masks' => (bool) $settings['sanitizer_convert_white_masks'],
+        ]);
+
+        $processed = 0;
+        $errors    = [];
+
+        foreach ($batch as $file_path) {
+            $raw = @file_get_contents($file_path);
+            if ($raw === false) {
+                $errors[] = basename($file_path) . ': ' . __('could not read file', 'jvm-rich-text-icons');
+                $processed++;
+                continue;
+            }
+            $r = $sanitizer->process($raw);
+            if ($r->has_error()) {
+                $errors[] = basename($file_path) . ': ' . $r->get_error()->get_error_message();
+            } else {
+                file_put_contents($file_path, $r->svg);
+            }
+            $processed++;
+        }
+
+        $done = ($offset + $processed) >= $total;
+
+        if ($done) {
+            delete_transient('jvm_rti_css_v1');
+        }
+
+        wp_send_json([
+            'success'   => true,
+            'processed' => $offset + $processed,
+            'total'     => $total,
+            'done'      => $done,
+            'errors'    => $errors,
+        ]);
     }
 
     /**
@@ -345,20 +432,86 @@ class JVM_Richtext_icons_settings {
      * @param array $input Contains all settings fields as array keys
      */
     public function sanitize( $input ) {
-        $sanitized = [];
+        // Start from the current saved values so each tab only updates its own fields,
+        // leaving the other tab's settings untouched.
+        $current   = get_option( 'jvm-rich-text-icons', [] );
+        $sanitized = is_array( $current ) ? $current : [];
 
-        $valid_icon_sets = ['default', 'fa-5', 'fa-6', 'fa-7', 'custom-svg'];
-        $valid_icon_sets = apply_filters('jvm_richtext_icons_valid_icon_sets', $valid_icon_sets);
-        if (isset($input['icon_set']) && in_array($input['icon_set'], $valid_icon_sets, true)) {
-            $sanitized['icon_set'] = $input['icon_set'];
+        $tab = isset( $input['_tab'] ) ? sanitize_key( $input['_tab'] ) : 'icon-set';
+
+        if ( $tab === 'icon-set' ) {
+            $valid_icon_sets = ['default', 'fa-5', 'fa-6', 'fa-7', 'custom-svg'];
+            $valid_icon_sets = apply_filters('jvm_richtext_icons_valid_icon_sets', $valid_icon_sets);
+            if (isset($input['icon_set']) && in_array($input['icon_set'], $valid_icon_sets, true)) {
+                $sanitized['icon_set'] = $input['icon_set'];
+            }
+
+            $valid_technologies = ['html-css', 'html-css-before', 'html-css-after', 'inline-svg'];
+            if (isset($input['technology']) && in_array($input['technology'], $valid_technologies, true)) {
+                $sanitized['technology'] = $input['technology'];
+            }
         }
 
-        $valid_technologies = ['html-css', 'html-css-before', 'html-css-after', 'inline-svg'];
-        if (isset($input['technology']) && in_array($input['technology'], $valid_technologies, true)) {
-            $sanitized['technology'] = $input['technology'];
+        if ( $tab === 'tools' ) {
+            foreach (['sanitizer_normalize_colors', 'sanitizer_normalize_viewbox', 'sanitizer_square_viewbox',
+                      'sanitizer_remove_ids', 'sanitizer_convert_white_masks'] as $key) {
+                $sanitized[$key] = !empty($input[$key]);
+            }
         }
 
         return $sanitized;
+    }
+
+    /**
+     * Register sanitizer option fields on the Tools & Settings tab.
+     * Uses page slug 'jvm-rich-text-icons-tools' so these fields only appear
+     * when do_settings_sections('jvm-rich-text-icons-tools') is called.
+     */
+    public function register_sanitizer_fields()
+    {
+        $this->options = JVM_Richtext_icons::get_settings();
+
+        add_settings_section('sanitizer', '', '', 'jvm-rich-text-icons-tools');
+
+        $fields = [
+            'sanitizer_normalize_colors' => [
+                'label' => __('Normalize colors', 'jvm-rich-text-icons'),
+                'desc'  => __('Replace hardcoded fill and stroke colors with currentColor so icons automatically inherit the surrounding text color. White is excluded.', 'jvm-rich-text-icons'),
+            ],
+            'sanitizer_normalize_viewbox' => [
+                'label' => __('Normalize viewBox', 'jvm-rich-text-icons'),
+                'desc'  => __('Derive a viewBox from width/height attributes when missing, then remove explicit width/height so the icon scales freely with CSS.', 'jvm-rich-text-icons'),
+            ],
+            'sanitizer_square_viewbox' => [
+                'label' => __('Square viewBox', 'jvm-rich-text-icons'),
+                'desc'  => __('Pad non-square viewBoxes to a square canvas by centering the content. Useful when icons need uniform dimensions in a grid.', 'jvm-rich-text-icons'),
+            ],
+            'sanitizer_remove_ids' => [
+                'label' => __('Remove IDs', 'jvm-rich-text-icons'),
+                'desc'  => __('Strip id attributes to prevent DOM collisions when the same icon appears multiple times on a page. IDs on mask elements are always preserved.', 'jvm-rich-text-icons'),
+            ],
+            'sanitizer_convert_white_masks' => [
+                'label' => __('Convert white masks', 'jvm-rich-text-icons'),
+                'desc'  => __('Auto-detect icons that use white shapes as cutouts and convert them to proper SVG mask elements. This ensures they render correctly with currentColor.', 'jvm-rich-text-icons'),
+            ],
+        ];
+
+        foreach ($fields as $key => $config) {
+            $opts = $this->options;
+            add_settings_field(
+                $key,
+                $config['label'],
+                function () use ($key, $config, $opts) {
+                    $checked = !empty($opts[$key]);
+                    echo '<label>';
+                    echo '<input type="checkbox" name="jvm-rich-text-icons[' . esc_attr($key) . ']" value="1"' . checked($checked, true, false) . '>';
+                    echo '</label>';
+                    echo '<p class="description">' . esc_html($config['desc']) . '</p>';
+                },
+                'jvm-rich-text-icons-tools',
+                'sanitizer'
+            );
+        }
     }
 }
 
